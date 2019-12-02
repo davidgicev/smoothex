@@ -26,10 +26,18 @@ function createField() {
 	let color = document.createElement("div")
 	color.className = "fieldColor"
 
+	let colorText = document.createElement("div")
+	colorText.className = "fieldColorText"
+	colorText.innerHTML = "Color"
+
+	let colorButton = document.createElement("div")
+	colorButton.innerHTML = '<i class="fas fa-pen"></i>'
+	colorButton.className = "fieldColorButton"
+
 	color.onclick = () => {
 		let input = prompt("Color")
 		functions[element.id].color = input
-		color.style.backgroundColor = input
+		color.style.borderColor = input
 		draw()
 	}
 
@@ -49,8 +57,7 @@ function createField() {
 	  		eval("animations.push(drawFunctionInit({f: x => " + parseInput(this.value) + ", color:'"+color+"', id: "+freeId+"}));")
 	  		this.parentElement.id = freeId
 	  		this.nextSibling.children[0].innerHTML = "Parsed: "+parseInput(this.value)
-	  		this.nextSibling.children[1].style.backgroundColor = color
-	  		this.nextSibling.children[1].innerHTML = "Color"
+	  		this.nextSibling.children[1].style.borderColor = color
 	  		container.style.display = "block"
 	  		skrieni = 0
 	  		animate()
@@ -66,9 +73,7 @@ function createField() {
   			animate()
   			functions[id] = null;
   			this.parentElement.id = -1
-  			this.nextSibling.children[0].innerHTML = ""
-	  		this.nextSibling.children[1].style.backgroundColor = "transparent"
-	  		this.nextSibling.children[1].innerHTML = ""
+	  		this.nextSibling.children[1].style.borderColor = "transparent"
 	  		container.style.display = "none"
 	  		this.blur()
 	  	}
@@ -80,6 +85,8 @@ function createField() {
 	});
 
 	container.appendChild(text)
+	color.appendChild(colorText)
+	color.appendChild(colorButton)
 	container.appendChild(color)
 	element.appendChild(input)
 	element.appendChild(container)
