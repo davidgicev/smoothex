@@ -106,3 +106,16 @@ function checkAddField() {
 	if(br == 0)
 		createField()
 }
+
+function roundToNumber(toRound, number) {
+	return toRound - (toRound%number)
+}
+
+function nearestTen(number) {
+	number = Math.abs(number)
+	return Math.pow(2, Math.floor( Math.log(number)/Math.log(2) ));
+	if(broj > 5 || broj < 0.26)
+		return Math.pow(10, Math.floor( Math.log(number)/Math.log(10) ))
+	else
+		return broj
+}

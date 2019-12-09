@@ -14,7 +14,7 @@ body {
 	position: absolute;
 	top:0px;
 	left:0px;
-	background-color: rgba(0,0,0,0.9);
+	background-color: rgba(255,255,255,0.95);
 }
 
 .field {
@@ -22,7 +22,7 @@ body {
 	margin-top: 15px;
 	margin-left: 10px;
 	display: block;
-	color: white;
+	color: black;
 	font-size: 20px;
 }
 
@@ -42,11 +42,11 @@ body {
 	outline: none;
 	padding: 10px;
 	border: none;
-	border-bottom: 1px solid white;
+	border-bottom: 1px solid black;
 	background-color: transparent;
 	font-size: 20px;
 	font-family: Georgia;
-	color: white;
+	color: black;
 }
 
 .fieldText {

@@ -10,11 +10,26 @@ var xAxis = windowHeight/2
 var screenWidth = windowWidth
 var commandContainerRatio = 0.2
 var zoom = 1
-var scale = Math.max(windowWidth, windowHeight)/8
+var scale = Math.max(windowWidth, windowHeight)/13
 var xInterval = -windowWidth/scale/2 - windowWidth*commandContainerRatio/scale/2
 var yInterval = -windowHeight/scale/2
 
 var skrieni = 1
+
+var light = {
+	background: "white",
+	axes: "black",
+	font: "gray"
+}
+
+var dark = {
+	background: "black",
+	axes: "white",
+	font: "white"
+}
+
+var theme = light;
+
 
 var POCHETEN = scale
 
@@ -25,6 +40,9 @@ document.getElementById("window").style.height = windowHeight + "px"
 
 document.getElementById("commandContainer").style.width  = windowWidth*commandContainerRatio + "px"
 document.getElementById("commandContainer").style.height = windowHeight     + "px"
+
+//document.getElementById("commandContainer").style.backgroundColor = theme.background;
+document.getElementById("screen").style.backgroundColor = theme.background;
 
 initCommands()
 draw()
@@ -50,14 +68,19 @@ function pan() {
 	lastMouseX = mouseX
 	lastMouseY = mouseY
 
-	draw();
+	draw()
 }
 
 document.getElementById("screen").addEventListener("mousemove", (event) => {
 	mouseX = event.clientX
 	mouseY = event.clientY
 	if(isMouseDown) {
-		pan()
+		if(animations.length) {
+			pan()
+		}
+		else {
+			requestAnimationFrame(pan)
+		}
 	}
 })
 
@@ -88,11 +111,13 @@ document.getElementById("screen").addEventListener("wheel", (event) => {
 	draw()
 })	
 
-var mouseX = 0;
-var mouseY = 0;
+var mouseX = windowWidth/2 + windowWidth*commandContainerRatio/2;
+var mouseY = windowHeight/2;
 
 var lastMouseX = 0;
 var lastMouseY = 0;
+
+var elapsedTime = 0
 
 var interval;
 
@@ -117,7 +142,7 @@ function checkKey(e) {
 }
 
 function getRandomColor() {
-  return "hsl("+(Math.random()*300+240)+", 100%, 85%)";
+  return "hsl("+(Math.random()*300+240)+", 80%, 50%)";
 }
 
 function animate() {

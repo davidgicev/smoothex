@@ -1,5 +1,6 @@
 function draw() {
 	drawAxes();
+	drawGrid()
 	drawFunctions();
 }
 
@@ -15,9 +16,7 @@ function drawAxes() {
 	let ctx = canvas.getContext('2d');
 	ctx.clearRect(0,0,windowWidth,windowHeight)
 
-	n = Math.min(0.02/(scale/windowWidth), 0.01)
-
-	ctx.strokeStyle = "white"
+	ctx.strokeStyle = theme.axes
 	ctx.lineWidth = 1
 
 	ctx.beginPath()
@@ -33,15 +32,20 @@ function drawAxes() {
 	ctx.font = "15px Arial";
 	ctx.textAlign = "center";
 
+	let n = screenWidth*(1-commandContainerRatio)/scale
 
-	for(let i=Math.floor(xInterval); i<screenWidth/scale + xInterval; i += 1) {
+	n /= 5;
+
+	n = nearestTen(n)
+
+	for(let i=roundToNumber(xInterval, n); i<screenWidth/scale + xInterval; i += n) {
 
 		let x = i
 		let renderX = (i-xInterval)*scale 
 
 		ctx.lineWidth = 1
 
-		ctx.fillStyle = "white"
+		ctx.fillStyle = theme.axes
 
 		ctx.beginPath()
 		let length = 5
@@ -57,14 +61,14 @@ function drawAxes() {
 
 	}
 
-	for(let i=Math.floor(yInterval); i<windowHeight/scale + yInterval; i += 1) {
+	for(let i=roundToNumber(yInterval, n); i<windowHeight/scale + yInterval; i += n) {
 
 		let y = i
 		let renderY = (i-yInterval)*scale 
 
 		ctx.lineWidth = 1
 
-		ctx.fillStyle = "white"
+		ctx.fillStyle = theme.axes
 
 		ctx.beginPath()
 		let length = 5
@@ -76,15 +80,70 @@ function drawAxes() {
 		if(i == 0)
 			continue
 
-		ctx.fillText(i, -xInterval*scale + 15, renderY + 5);
+		ctx.fillText(-i, -xInterval*scale + String(i).length*5+10, renderY + 4);
 
 	}
 }
 
+
+function drawGrid() {
+
+	let ctx = canvas.getContext('2d');
+
+	ctx.strokeStyle = theme.axes
+	ctx.lineWidth = 1
+
+	ctx.font = "15px Arial";
+	ctx.textAlign = "center";
+
+	let n = screenWidth*(1-commandContainerRatio)/scale
+
+	n /= 20;
+
+	n = nearestTen(n)
+
+	for(let i=roundToNumber(xInterval, n); i<screenWidth/scale + xInterval; i += n) {
+
+		let x = i
+		let renderX = (i-xInterval)*scale 
+
+		ctx.lineWidth = 1
+
+		ctx.strokeStyle = "rgba(0,0,0,0.2)"
+
+		ctx.beginPath()
+		let length = 5
+		ctx.moveTo(renderX, 0)
+		ctx.lineTo(renderX, windowHeight)
+		ctx.stroke()
+
+	}
+
+	for(let i=roundToNumber(yInterval, n); i<windowHeight/scale + yInterval; i += n) {
+
+		let y = i
+		let renderY = (i-yInterval)*scale 
+
+		ctx.lineWidth = 1
+
+		ctx.strokeStyle = "rgba(0,0,0,0.2)"
+
+		ctx.beginPath()
+		let length = 5
+		ctx.moveTo(0, renderY)
+		ctx.lineTo(windowWidth, renderY)
+		ctx.stroke()
+
+	}
+}
 function drawFunction(f) {
 
-	let n = 0.1;
+	let n = 0.01
+
 	let minatIzvod = 1
+	let sporedbeno = 0.1
+
+	//let vreme = (new Date()).getTime()
 
 	if(!f || f.hidden) {
 		return
@@ -95,7 +154,7 @@ function drawFunction(f) {
 
 	let ctx = canvas.getContext("2d")
 
-	for(let i=xInterval; i<screenWidth/scale + xInterval; i += n) {
+	for(let i=xInterval; i<screenWidth/scale + xInterval;) {
 
 	ctx.strokeStyle = color
 	ctx.lineWidth = 3
@@ -104,17 +163,13 @@ function drawFunction(f) {
 	let y = -f(x)
 
 
-	let x2 = i+n
-	let y2 = -f(x2)
+	i += n
 
-	// let momentalenIzvod = (y2-y)/n
-	// n = Math.max(Math.min(1/((momentalenIzvod - minatIzvod)/n + 0.01), 0.5), 0.01)
-	// console.log(n)
-	// minatIzvod = momentalenIzvod
-
-	if(Math.abs((y-y2)*scale) > windowHeight) {
+	if(isNaN(y))
 		continue
-	}
+
+	let x2 = i
+	let y2 = -f(x2)
 
 	let renderX = (x-xInterval)*scale
 	let renderY = (y-yInterval)*scale
@@ -122,19 +177,68 @@ function drawFunction(f) {
 	let renderX2 = (x2-xInterval)*scale
 	let renderY2 = (y2-yInterval)*scale
 
-	// let renderN = (-n-yInterval)*scale
+
+	let momentalenIzvod = (-(y2-y)/n)
+	let starn = n
+	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/n)*10, 2)
+	promena = Math.max(1 / promena, 0.01)
+	promena = promena*Math.min(Math.sqrt(screenWidth/scale/12), 5)
+
+
+	// let zaRender = (momentalenIzvod - minatIzvod)/n
+
+	n = promena
+
+		
+
+	if(starn > n) {
+
+	// ctx.fillStyle = "red"
 
 	// ctx.beginPath()
-	// ctx.arc(renderX, renderN, 2, 0, 2*3.14)
-	// ctx.fillStyle = "white"
+	// ctx.arc(renderX,  (y - yInterval)*scale, 10, 0, 2*3.14);
 	// ctx.fill()
+
+		i = i - starn
+		continue
+	}
+
+	// ctx.fillStyle = "black"
+
+	// ctx.beginPath()
+	// ctx.arc(renderX,  (-zaRender - yInterval)*scale, 5, 0, 2*3.14);
+	// ctx.fill()	
+
+	minatIzvod = momentalenIzvod
+
+	if(Math.abs(momentalenIzvod) > windowHeight) {
+		//asimptota
+
+		ctx.beginPath()
+		ctx.moveTo(renderX , renderY)
+		ctx.lineTo(renderX, Math.sign(y)*(windowHeight))
+		ctx.stroke()
+
+		ctx.beginPath()
+		ctx.moveTo(renderX2 , renderY2)
+		ctx.lineTo(renderX, Math.sign(y2)*(windowHeight))
+		ctx.stroke()
+
+		continue
+	}
+
 
 	ctx.beginPath()
 	ctx.moveTo(renderX , renderY)
 	ctx.lineTo(renderX2, renderY2)
 	ctx.stroke()
-	ctx.fill()
+
 	}
+
+	//elapsedTime += (new Date()).getTime() - vreme
+	//console.log(elapsedTime)
+	//elapsedTime = 0
+
 }
 
 

@@ -9,7 +9,7 @@ function parseInput(input) {
 
 	//console.log(input)
 
-	let functions = ["sin", "cos", "tan", "cotan"]
+	let functions = ["sin", "cos", "cotan", "tan"]
 
 
 	for(let i=0; i<input.length; i++) {
