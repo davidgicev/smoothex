@@ -309,6 +309,7 @@ function drawFunctionInit(f) {
 function drawFunctionTransition(f1, f2) {
 
 	f1.hidden = true
+	draw()
 
 	let funkcija = function() {
 
@@ -317,7 +318,7 @@ function drawFunctionTransition(f1, f2) {
 			functions[f1.id] = f2;
 			functions[f1.id].hidden = false
 
-			drawFunctions()
+			draw()
 			
 			return -1
 		}
