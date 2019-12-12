@@ -191,10 +191,10 @@ function animate() {
 		},
 		funk: function() {
 			draw()
-			if(animations.length == 0)
-				return
-			if(animations[0]() == -1) {
-				animations.splice(0, 1)
+			for(let i=0; i<animations.length; i++) {
+				if(animations[i]() == -1) {
+					animations.splice(i, 1)
+				}
 			}
 		}
 	}
