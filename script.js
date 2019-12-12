@@ -14,6 +14,11 @@ var scale = Math.max(windowWidth, windowHeight)/13
 var xInterval = -windowWidth/scale/2 - windowWidth*commandContainerRatio/scale/2
 var yInterval = -windowHeight/scale/2
 
+var variables = [{
+	name: "x",
+	value: null
+}]
+
 var skrieni = 1
 
 var light = {
@@ -33,7 +38,24 @@ var theme = light;
 
 var POCHETEN = scale
 
-var functions = []
+var functions = [{
+		name: "sin",
+		f: Math.sin
+	},
+	{
+		name: "cos",
+		f: Math.cos
+	},
+	{
+		name: "tan",
+		f: Math.tan
+	},
+	{
+		name: "cotan",
+		f: Math.cotan
+	}]
+
+var fields = []
 
 document.getElementById("window").style.width  = windowWidth  + "px"
 document.getElementById("window").style.height = windowHeight + "px"
@@ -54,9 +76,11 @@ function initCommands() {
 	createField()
 	createField()
 	createField()
+
+	container.children[0].children[0].focus()
 }
 
-var n = 0.01
+var nIncrement = 0.01
 function pan() {
 
 	xInterval -= (mouseX - lastMouseX)/scale

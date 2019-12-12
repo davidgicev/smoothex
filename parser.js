@@ -1,129 +1,285 @@
 function parseInput(input) {
+	
+	input = input.replace(/ /g,'')
+
+	let EqualsIndex = input.indexOf("=")
+
+	if(EqualsIndex == -1 || input.indexOf("(x)") == EqualsIndex - 3) {
+		// f(x) = neshto
+
+		let name = EqualsIndex == -1 ? Date.now()+"_" : input.substring(0, EqualsIndex - 3)
+		
+		let object = {
+			name: name,
+			f: null,
+			color: getRandomColor(),
+			id: null,
+		} 
+
+		try {			
+			eval("object.f = x => " + parseExpression(input.substring(EqualsIndex + 1)).parsed)
+		}catch(e) {
+			console.log(e)
+			if(e)
+				return 0;
+		}
+
+		object.readable = parseExpression(input.substring(EqualsIndex + 1)).readable
+		
+		return object
+	}
+	else if(input.indexOf("(x)") == -1 || input.indexOf("(x)") > EqualsIndex) {
+		// a = neshto
+
+		let name = input.substring(0,EqualsIndex)
+
+		let object = {
+			name: name,
+			value: null
+		}
+
+		try{
+		eval("object.value = " + parseExpression(input.substring(EqualsIndex + 1)).parsed)
+		}catch(e) {
+			if(e)
+				return 0;
+		}
+
+		return object
+
+	}
+
+	
+}
+
+function contains(array, property, value) {
+	for(let i=0; i<array.length; i++) {
+		if(array[i][property] == value)
+			return 1
+	}
+	return 0;
+}
+
+function parseExpression(input) {
 
 	input = input.replace(/ /g,'')
 
-	for(let i=0; i<input.length-1; i++) {
-		if("0123456789".indexOf(input[i]) != -1 && "+-/*0123456789^)".indexOf(input[i+1]) == -1)
-			input = input.substring(0,i+1)+"*"+input.substring(i+1)
-	}
+	let targets = findObjects(input)
+	// console.log(targets)
+	let completed = ""
+	let readable = ""
 
-	//console.log(input)
-
-	let functions = ["sin", "cos", "cotan", "tan"]
-
+	let najdeno = 0
 
 	for(let i=0; i<input.length; i++) {
-		
-		let index = input.indexOf("^");
-		let openP = 0
-		//console.log("Index na ^ : "+index)
 
-		if(index == -1)
-			break
+		najdeno = 0
 
-		let leftSymbolIndex = index - 1, rightSymbolIndex = index + 1
+		for(let j=0; j<targets.length; j++) {
 
-		let leftSymbol, rightSymbol;
+			if(targets[j].index <= i && i <= targets[j].index + targets[j].length - 1) {
 
-		while(leftSymbolIndex > 0) {
+				najdeno = 1
 
-			leftSymbol = input[leftSymbolIndex]
+				// console.log("Najdeno e i ("+i+") vo targets "+j)
 
-			if(leftSymbol == ")") 
-				openP++
-
-			else if(leftSymbol == "(")
-				openP--
-
-			if(openP <= 0) {
-				if("()".indexOf(leftSymbol) != -1) {
-					leftSymbolIndex++;
+				if(i > 0 && i == targets[j].index && "(+-*/^.".indexOf(completed[completed.length-1]) == -1) {
+					completed += "*"
+					readable  += "*"
+					// console.log(completed)
 				}
-					break;
-			}
 
-			leftSymbolIndex--;
-		}
+				if(i == targets[j].index + targets[j].length - 1) {
 
-		//console.log("left side index:"+leftSymbolIndex+", celo left: "+input.substring(leftSymbolIndex, index))
+					// console.log("i ("+i+") e kraj na objekt "+j)
 
-		openP = 0
+					if(targets[j].variable) {
 
-		while(rightSymbolIndex < input.length) {
+						// console.log("Variable! ")
 
-			rightSymbol = input[rightSymbolIndex]
-
-			if(rightSymbol == "(") 
-				openP++
-
-			else if(rightSymbol == ")")
-				openP--
-
-			if(openP <= 0) {
-				rightSymbolIndex++;
-				break;
-			}
-
-			rightSymbolIndex++;
-		}
-		
-		//console.log("right side index:"+rightSymbolIndex+", celo right: "+input.substring(index+1, rightSymbolIndex))
-
-		input = input.substring(0, leftSymbolIndex) + "Math.pow(" + input.substring(leftSymbolIndex, index) + "," + input.substring(index+1, rightSymbolIndex) + ")" + input.substring(rightSymbolIndex)
-		//console.log(input);
-	
-	}
-
-	for(let i=0; i<functions.length; i++) {
-		for(let j=0; j<input.length;) {
-
-				let ostanato = input.substring(j)
-				//console.log(ostanato)
-
-				let index = ostanato.indexOf(functions[i])
-				
-				if(index == -1)
-					break;
-
-				index += j
-
-				//console.log("Pochnuva da bara: "+input.substring(j))
-				//console.log("Index na "+functions[i]+": "+index+", ponatamu: "+input.substring(index))
-
-				if(input[index-1] == ".")
-					break
-
-				let openP = 0
-
-				let rightSymbolIndex = index + functions[i].length
-
-				let rightSymbol;
-
-				while(rightSymbolIndex < input.length) {
-
-					rightSymbol = input[rightSymbolIndex]
-
-					if(rightSymbol == "(") 
-						openP++
-
-					else if(rightSymbol == ")")
-						openP--
-
-					if(openP <= 0) {
-						if("+-*/".indexOf(rightSymbol) != -1) {
-							break;	
+						if(targets[j].objectIndex == 0) {
+							completed += "x"					
+							readable += "x"					
 						}
+						else {
+							completed += "variables[" + targets[j].objectIndex + "].value"
+							readable  += variables[targets[j].objectIndex].name
+						}
+						
+						if(i+1 < input.length && "+-*/^).".indexOf(input[i+1]) == -1) {
+							completed += "*"
+							readable  += "*"
+						}
+					// console.log(completed)
 					}
+					else {
 
-					rightSymbolIndex++;
+						// console.log("Funkcija!")
+						
+						completed += "functions[" + targets[j].objectIndex + "].f"
+						readable  += functions[targets[j].objectIndex].name
+						
+						if(input[i+1] != "(") {
+							completed += "("
+							readable  += "("							
+						}
+					// console.log(completed)
+					}
 				}
+				
 
-				input = input.substring(0, index) + "Math." + functions[i] + "(" + input.substring(index + functions[i].length, rightSymbolIndex) + ")" + input.substring(rightSymbolIndex)
-				j += rightSymbolIndex + functions[i].length + 4
-		}	
+				continue;
+			}
+		}
+
+		if(najdeno)
+			continue
+
+		if(isNaN(input[i])) {
+			if("+-()*^/.".indexOf(input[i]) == -1)
+				return {
+					parsed: "(",
+					readable: null
+				}
+			completed += input[i]
+			readable  += input[i]
+		}
+		else if(input[i+1] == "(") {
+			completed += input[i] + "*"
+			readable  += input[i] + "*"
+		}
+		else {
+			completed += input[i]
+			readable  += input[i]
+		}
 	}
-	
+
+	for(let i=0; i<completed.length; i++) {
+		if(completed[i] == "(") {
+			completed = completed.substring(0,i) + encapsulate(completed.substring(i))
+			i++
+		}
+	}
+
+	completed = completed.replace(/\^/g, '**');
+
+	for(let i=0; i<readable.length; i++) {
+		if(readable[i] == "(") {
+			readable = readable.substring(0,i) + encapsulate(readable.substring(i))
+			i++
+		}
+	}
+
+	return {
+		parsed: completed,
+		readable: readable
+	}
+}
+
+function encapsulate(input) {
+
+	let openP = 0
+
+	for(let i=0; i<input.length; i++) {
+
+		if(input[i] == "(")
+			openP++
+
+		else if(input[i] == ")")
+			openP--
+
+		else if(openP > 0 && "+-".indexOf(input[i]) != -1) {
+			
+			if(numberOfInstances(input.substring(i), ")") < numberOfInstances(input.substring(i), "(") + openP) {
+				input = input.substring(0, i) + ")" + input.substring(i)
+				openP--
+			}
+
+		}
+
+	}
+
+	for(let i=0; i<openP; i++) 
+		input += ")"
+
 	return input
 }
 
+function numberOfInstances(string, character) {
+	let br = 0
+	for(let i=0; i<string.length; i++) {
+		if(string[i] == character)
+			br++
+	}
+	return br
+}
 
+function findObjects(input) {
+
+	let targets = []
+
+	let offSet = 0
+
+	let result = findNext(input, offSet)
+
+	while(result) {
+		targets.push(result)
+		offSet = result.index + result.length
+		result = findNext(input, offSet)
+	}
+
+	return targets
+}
+
+function findNext(input, startIndex) {
+
+
+	input = input.substring(startIndex)
+
+	let functionIndex = 0					//indeks na funkcijata koja se pojavuva
+	let minIndexFunction = input.length 	//min indeks na najdena funkcija
+	let index;
+
+	for(let i=0; i<functions.length; i++) {
+
+		index = input.indexOf(functions[i].name)
+
+		if(index != -1 && index < minIndexFunction) {
+			minIndexFunction = index
+			functionIndex = i
+		}
+	}
+
+	let variableIndex = 0
+	let minIndexVariable = input.length
+	
+	for(let i=0; i<variables.length; i++) {
+
+		index = input.indexOf(variables[i].name)
+
+		if(index != -1 && index < minIndexVariable) {
+			minIndexVariable = index
+			variableIndex = i
+		}
+	}
+
+	if(minIndexVariable == input.length && minIndexFunction == input.length)
+		return 0;
+
+	if(minIndexVariable < minIndexFunction) {
+		return {
+			index: minIndexVariable + startIndex,
+			objectIndex: variableIndex,
+			variable: true,
+			length: variables[variableIndex].name.length
+		}
+	}
+	else {
+		return {
+			index: minIndexFunction + startIndex,
+			objectIndex: functionIndex,
+			variable: false,
+			length: functions[functionIndex].name.length
+		}
+	}
+}

@@ -7,7 +7,7 @@ function createField() {
 	let input = document.createElement("input")
 	input.type = "text"
 	input.className = "fieldInput"
-	input.placeholder = "insert function"
+	input.placeholder = "insert expression"
 	input.spellcheck = 0
 	input.onfocus = () => {
 		hideInfo()
@@ -31,12 +31,13 @@ function createField() {
 	colorText.innerHTML = "Color"
 
 	let colorButton = document.createElement("div")
-	colorButton.innerHTML = '<i class="fas fa-pen"></i>'
+	colorButton.innerHTML = '<i class="far fa-edit"></i>'
 	colorButton.className = "fieldColorButton"
 
 	color.onclick = () => {
 		let input = prompt("Color")
-		functions[element.id].color = input
+		fields[element.id].color = input
+		functions[fields[element.id].id].color = input
 		color.style.borderColor = input
 		draw()
 	}
@@ -48,38 +49,183 @@ function createField() {
 	  	event.preventDefault()
 
 	  	let id = this.parentElement.id
-	  	let freeId = getFreeId()
 
-	  	let empty = this.value == ""
+	  	let inputEmpty = this.value == ""
 
-	  	if(id == -1 && !empty) {
-	  		let color = getRandomColor()
-	  		eval("animations.push(drawFunctionInit({f: x => " + parseInput(this.value) + ", color:'"+color+"', id: "+freeId+"}));")
-	  		this.parentElement.id = freeId
-	  		this.nextSibling.children[0].innerHTML = "Parsed: "+parseInput(this.value)
-	  		this.nextSibling.children[1].style.borderColor = color
+	  	if(id == -1 && !inputEmpty) {
+	  		
+	  		let object = parseInput(this.value)
+
+	  		if(!object) {
+	  			alert("Neshto ne e u red")
+	  			return
+	  		}
+
+	  		id = getFreeId()
+
+	  		fields[id] = object
+
+	  		if(fields[id].f) {
+
+	  			if(contains(functions, "name", object.name)) {
+	  				alert("Vekje definirano")
+	  				return
+	  			}
+
+	  			fields[id] = object
+	  			object.id = functions.length
+	  			functions.push(object)
+
+	  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
+	  			this.nextSibling.children[1].style.borderColor = object.color
+
+	  			animations.push(drawFunctionInit(object))
+	  		}
+	  		else {
+
+	  			if(contains(variables, "name", object.name)) {
+	  				alert("Vekje definirano")
+	  				return
+	  			}
+
+	  			fields[id] = object
+	  			object.id = variables.length
+	  			variables.push(object)
+
+	  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+	  			this.nextSibling.children[1].style.display = "none"
+
+	  			draw()
+	  		}
+
 	  		container.style.display = "block"
 	  		skrieni = 0
+
+	  		this.parentElement.id = id
+
 	  		animate()
 	  	}
-	  	else if(id != -1 && !empty){
-  			eval("animations.push(drawFunctionTransition(functions["+id+"], x => " + parseInput(this.value) + ", "+id+"));")
-	  		functions[id].hidden = true
+	  	else if(id != -1 && !inputEmpty){
+
+	  		let object = parseInput(this.value)
+
+	  		object.id = fields[id].id
+
+	  		if(!fields[id].f == !object.f) {
+
+	  			if(fields[id].f) {
+
+	  				if(fields[id].name == object.name || !isNaN(fields[id].name[0]) && !isNaN(object.name[0])) {
+
+	  					object.color = fields[id].color
+	  					animations.push(drawFunctionTransition(fields[id], object))
+	  					fields[id] = object
+
+	  					this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
+	  				}
+	  				else {
+
+	  					animations.push(drawFunctionClosure(functions[fields[id].id]))
+		  				fields[id] = null
+
+		  				id = getFreeId()
+		  				fields[id] = object
+			  			object.id = functions.length
+			  			functions.push(object)
+
+			  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
+			  			this.nextSibling.children[1].style.borderColor = object.color
+
+		  				animations.push(drawFunctionInit(object))
+	  				}
+
+	  			}
+	  			else {
+
+					fields[id] = object
+	  	  			variables[fields[id].id] = object
+
+	  	  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+
+	  	  			draw()
+	  			}
+	  		}
+	  		else {
+
+
+		  		if(!fields[id].f) {
+
+		  			variables.splice(fields[id].id)
+	
+		  			fields[id] = object
+
+		  			if(contains(functions, "name", object.name)) {
+		  				alert("Vekje definirano")
+		  				return
+		  			}
+
+		  			fields[id] = object
+		  			object.id = functions.length
+		  			functions.push(object)
+
+		  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
+		  			this.nextSibling.children[1].style.borderColor = object.color
+
+		  			animations.push(drawFunctionInit(object))
+	  				this.nextSibling.children[1].style.display = "block"
+
+		  		}
+		  		else {
+
+		  			if(contains(variables, "name", object.name)) {
+		  				alert("Vekje definirano")
+		  				return
+		  			}
+
+		  			animations.push(drawFunctionClosure(functions[fields[id].id]))
+
+		  			fields[id] = object
+		  			object.id = variables.length
+		  			variables.push(object)
+
+		  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+		  			this.nextSibling.children[1].style.display = "none"
+		  			draw()
+		  		}
+
+	  		}
+
+	  		this.parentElement.id = id
+  			
 	  		animate()
-  			this.nextSibling.children[0].innerHTML = "Parsed: "+parseInput(this.value)
 	  	}
 	  	else {
-  			eval("animations.push(drawFunctionClosure(functions["+id+"]));")
-  			animate()
-  			functions[id] = null;
+
+	  		if(fields[id].f) {
+
+		  		animations.push(drawFunctionClosure(functions[fields[id].id]))
+
+		  		fields[id] = null
+
+	  			animate()
+
+
+		  		this.nextSibling.children[1].style.borderColor = "transparent"
+	  		
+	  		}
+	  		else {
+
+	  			variables.splice(fields[id].id, 1)
+	  			fields[id] = null
+	  		}
+
   			this.parentElement.id = -1
-	  		this.nextSibling.children[1].style.borderColor = "transparent"
-	  		container.style.display = "none"
+
 	  		this.blur()
+	  		container.style.display = "none"
 	  	}
 
 	  	checkAddField()
-
 	  	draw()
 	  }
 	});

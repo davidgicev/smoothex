@@ -1,12 +1,12 @@
 function draw() {
-	drawAxes();
+	drawAxes()
 	drawGrid()
-	drawFunctions();
+	drawFunctions()
 }
 
 function drawFunctions() {
 
-	for (let i=0; i<functions.length; i++) {
+	for (let i=4; i<functions.length; i++) {
 		drawFunction(functions[i])
 	}
 }
@@ -32,13 +32,13 @@ function drawAxes() {
 	ctx.font = "15px Arial";
 	ctx.textAlign = "center";
 
-	let n = screenWidth*(1-commandContainerRatio)/scale
+	let nIncrement = screenWidth*(1-commandContainerRatio)/scale
 
-	n /= 5;
+	nIncrement /= 5;
 
-	n = nearestTen(n)
+	nIncrement = nearestTen(nIncrement)
 
-	for(let i=roundToNumber(xInterval, n); i<screenWidth/scale + xInterval; i += n) {
+	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
 		let x = i
 		let renderX = (i-xInterval)*scale 
@@ -61,7 +61,7 @@ function drawAxes() {
 
 	}
 
-	for(let i=roundToNumber(yInterval, n); i<windowHeight/scale + yInterval; i += n) {
+	for(let i=roundToNumber(yInterval, nIncrement); i<windowHeight/scale + yInterval; i += nIncrement) {
 
 		let y = i
 		let renderY = (i-yInterval)*scale 
@@ -96,13 +96,13 @@ function drawGrid() {
 	ctx.font = "15px Arial";
 	ctx.textAlign = "center";
 
-	let n = screenWidth*(1-commandContainerRatio)/scale
+	let nIncrement = screenWidth*(1-commandContainerRatio)/scale
 
-	n /= 20;
+	nIncrement /= 20;
 
-	n = nearestTen(n)
+	nIncrement = nearestTen(nIncrement)
 
-	for(let i=roundToNumber(xInterval, n); i<screenWidth/scale + xInterval; i += n) {
+	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
 		let x = i
 		let renderX = (i-xInterval)*scale 
@@ -119,7 +119,7 @@ function drawGrid() {
 
 	}
 
-	for(let i=roundToNumber(yInterval, n); i<windowHeight/scale + yInterval; i += n) {
+	for(let i=roundToNumber(yInterval, nIncrement); i<windowHeight/scale + yInterval; i += nIncrement) {
 
 		let y = i
 		let renderY = (i-yInterval)*scale 
@@ -136,9 +136,10 @@ function drawGrid() {
 
 	}
 }
+
 function drawFunction(f) {
 
-	let n = 0.01
+	let nIncrement = 0.01
 
 	let minatIzvod = 1
 	let sporedbeno = 0.1
@@ -163,7 +164,7 @@ function drawFunction(f) {
 	let y = -f(x)
 
 
-	i += n
+	i += nIncrement
 
 	if(isNaN(y))
 		continue
@@ -178,20 +179,20 @@ function drawFunction(f) {
 	let renderY2 = (y2-yInterval)*scale
 
 
-	let momentalenIzvod = (-(y2-y)/n)
-	let starn = n
-	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/n)*10, 2)
+	let momentalenIzvod = (-(y2-y)/nIncrement)
+	let starn = nIncrement
+	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 2)
 	promena = Math.max(1 / promena, 0.01)
 	promena = promena*Math.min(Math.sqrt(screenWidth/scale/12), 5)
 
 
-	// let zaRender = (momentalenIzvod - minatIzvod)/n
+	// let zaRender = (momentalenIzvod - minatIzvod)/nIncrement
 
-	n = promena
+	nIncrement = promena
 
 		
 
-	if(starn > n) {
+	if(starn > nIncrement) {
 
 	// ctx.fillStyle = "red"
 
@@ -252,7 +253,7 @@ function drawParametric(f) {
 
 	let ctx = canvas.getContext("2d")
 
-	for(let t=0; t<100; t += n) {
+	for(let t=0; t<100; t += nIncrement) {
 
 	ctx.strokeStyle = color
 	ctx.lineWidth = 3
@@ -261,8 +262,8 @@ function drawParametric(f) {
 	let y = -yFunk(t)
 
 
-	let x2 =  xFunk(t+n)
-	let y2 = -yFunk(t+n)
+	let x2 =  xFunk(t+nIncrement)
+	let y2 = -yFunk(t+nIncrement)
 
 	let renderX = (x-xInterval)*scale
 	let renderY = (y-yInterval)*scale
@@ -280,17 +281,12 @@ function drawParametric(f) {
 
 function drawFunctionInit(f) {
 
-	functions[f.id] = {
-		f: f.f,
-		color: f.color,
-		hidden: true,
-	}
+	f.hidden = true
 
 	let funkcija = function() {
 
 		if(this.smooth > 1) {
-			this.smooth = 0
-			functions[f.id].hidden = false
+			f.hidden = false
 			drawFunctions()
 			return -1
 		}
@@ -310,15 +306,19 @@ function drawFunctionInit(f) {
 	return funkcija.bind({smooth:0});
 }
 
-function drawFunctionTransition(f1, f2, id) {
+function drawFunctionTransition(f1, f2) {
+
+	f1.hidden = true
 
 	let funkcija = function() {
 
 		if(this.smooth >= 1) {
-			this.smooth = 0
-			functions[id].f = f2;
-			functions[id].hidden = false
+
+			functions[f1.id] = f2;
+			functions[f1.id].hidden = false
+
 			drawFunctions()
+			
 			return -1
 		}
 
@@ -326,7 +326,7 @@ function drawFunctionTransition(f1, f2, id) {
 
 
 		let funk = {
-			f: x => f1.f(x) + koef*(f2(x) - f1.f(x)),
+			f: x => f1.f(x) + koef*(f2.f(x) - f1.f(x)),
 			color: f1.color,
 		}
 		
@@ -342,9 +342,14 @@ function drawFunctionTransition(f1, f2, id) {
 
 function drawFunctionClosure(f) {
 
+	f.hidden = true
+	functions.splice(f.id, 1)
+
 	let funkcija = function() {
 
 		if(this.smooth > 1) {
+
+
 			return -1
 		}
 
@@ -364,8 +369,8 @@ function drawFunctionClosure(f) {
 }
 
 function getFreeId() {
-	for(let i=0; i<functions.length; i++)
-		if(functions[i] == null)
+	for(let i=0; i<fields.length; i++)
+		if(fields[i] == null)
 			return i
-	return functions.length
+	return fields.length
 }
