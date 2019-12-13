@@ -99,12 +99,7 @@ document.getElementById("screen").addEventListener("mousemove", (event) => {
 	mouseX = event.clientX
 	mouseY = event.clientY
 	if(isMouseDown) {
-		if(animations.length) {
-			pan()
-		}
-		else {
-			requestAnimationFrame(pan)
-		}
+		pan()
 	}
 })
 

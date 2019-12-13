@@ -1,7 +1,7 @@
 function draw() {
 	drawAxes()
 	drawGrid()
-	drawFunctions()
+	requestAnimationFrame(drawFunctions)
 }
 
 function drawFunctions() {
