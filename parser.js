@@ -1,30 +1,37 @@
 function parseInput(input) {
-	
+
 	input = input.replace(/ /g,'')
+
+	console.log("parseInput: "+input)
 
 	let EqualsIndex = input.indexOf("=")
 
 	if(EqualsIndex == -1 || input.indexOf("(x)") == EqualsIndex - 3) {
 		// f(x) = neshto
 
-		let name = EqualsIndex == -1 ? Date.now()+"_" : input.substring(0, EqualsIndex - 3)
+		let name = EqualsIndex == -1 ? getFreeName() : input.substring(0, EqualsIndex - 3)
 		
 		let object = {
 			name: name,
 			f: null,
 			color: getRandomColor(),
 			id: null,
+			nameless: EqualsIndex == -1
 		} 
 
+		let result = parseExpression(input.substring(EqualsIndex + 1))
+
 		try {			
-			eval("object.f = x => " + parseExpression(input.substring(EqualsIndex + 1)).parsed)
+			console.log("object.f = x => " + result.parsed)
+			eval("object.f = x => " + result.parsed)
 		}catch(e) {
+			console.log("Invalid Input:")
 			console.log(e)
 			if(e)
 				return 0;
 		}
 
-		object.readable = parseExpression(input.substring(EqualsIndex + 1)).readable
+		object.readable = result.readable
 		
 		return object
 	}
@@ -55,14 +62,19 @@ function parseInput(input) {
 function contains(array, property, value) {
 	for(let i=0; i<array.length; i++) {
 		if(array[i][property] == value)
-			return 1
+			return i
 	}
-	return 0;
+	return -1;
 }
 
 function parseExpression(input) {
 
 	input = input.replace(/ /g,'')
+
+	console.log("parseExpression: "+input)
+	console.log("Rabotam so ")
+	console.log(functions)
+	console.log(variables)
 
 	let targets = findObjects(input)
 	// console.log(targets)
@@ -91,7 +103,7 @@ function parseExpression(input) {
 
 				if(i == targets[j].index + targets[j].length - 1) {
 
-					// console.log("i ("+i+") e kraj na objekt "+j)
+					// console.log("i ("+i+") e kraj na object "+j)
 
 					if(targets[j].variable) {
 
@@ -161,6 +173,12 @@ function parseExpression(input) {
 		}
 	}
 
+	for(let i=0; i<completed.length-1; i++) {
+		if(completed[i] == ")" && completed[i+1] == "(") {
+			completed = completed.substring(0, i+1) + "*" + completed.substring(i+1)
+		}
+	}
+
 	completed = completed.replace(/\^/g, '**');
 
 	for(let i=0; i<readable.length; i++) {
@@ -169,6 +187,8 @@ function parseExpression(input) {
 			i++
 		}
 	}
+
+	console.log("finished parseExpression: "+completed)
 
 	return {
 		parsed: completed,
@@ -282,4 +302,108 @@ function findNext(input, startIndex) {
 			length: functions[functionIndex].name.length
 		}
 	}
+}
+
+function processInputs(inputs) {
+
+	let functionsCopy = [... functions]
+	let variablesCopy = [... variables]
+
+	functions = functions.slice(0,4)
+	variables = [variables[0]]
+
+	let results = []
+
+	for(let i=0; i<inputs.length; i++) {
+
+		if(!inputs[i]) {
+			results.push(1)
+			continue
+		}
+
+		let object = parseInput(inputs[i]);
+
+		if(!object) {
+			results.push(0)
+			continue
+		}
+
+		if(object.nameless)
+			results.push(object.name)
+		else
+			results.push(1)
+
+		if(object.f) {
+
+			console.log("Funkcija e")
+
+			let index = contains(functionsCopy, "name", object.name)
+
+			if(!isNaN(object.name[0])) {
+				index = contains(functionsCopy, "readable", object.readable)
+				if(index != -1)
+					object.name = functionsCopy[index].name
+			}
+
+
+			if(index != -1) {
+
+				console.log("Postoi funkcijata")
+
+				if(functionsCopy[index].readable == object.readable) {
+					console.log("Nema potreba da se updatira")
+					functions.push(functionsCopy[index]) 
+					continue
+				}
+
+				console.log("Se updatira")
+
+				if(!parseExpression(functionsCopy[index].readable).readable) {
+					console.log("Nevaliden pochetok na tranzicija")
+					transitions.push(drawFunctionInit(object))
+					continue
+				}
+
+				// if(transitions.length)
+				// 	transitions = []
+
+				object.color = functionsCopy[index].color
+				functions.push(object)
+				transitions.push(drawFunctionTransition({...functionsCopy[index], id: index}, object))
+			}
+			else {
+				console.log("Ne postoi i se pravi nova")
+				transitions.push(drawFunctionInit(object))
+			}
+		}
+		else {
+
+			variables.push(object)
+
+			let index = contains(variablesCopy, "name", object.name)
+
+			if(index != -1) {
+
+				if(variablesCopy[index].value == object.value)
+					continue
+
+				variablesCopy[index] = object
+			}
+			else {
+				variables.push(object)
+			}
+		}
+	}
+
+	//tie shto gi snemalo
+
+	// for(let i=4; i<functionsCopy.length; i++) {
+	// 	if(contains(functions, "name", functionsCopy[i].name) == -1) {
+	// 		console.log("ke skratam "+functionsCopy[i].name)
+	// 		transitions.unshift(drawFunctionClosure({...functionsCopy[i], id:i}))
+	// 	}
+	// }
+
+	transition()
+	return results
 }

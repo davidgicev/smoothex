@@ -4,7 +4,6 @@ body {
 }
 
 #screen {
-	background-color: black;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -14,7 +13,7 @@ body {
 	position: absolute;
 	top:0px;
 	left:0px;
-	background-color: rgba(255,255,255,0.95);
+	background-color: rgba(255,255,255,0.9);
 }
 
 .field {
@@ -32,7 +31,6 @@ body {
 	border: none;
 	display: block;
 	border-radius: 20%;
-	background-color: lightblue;
 	color: black;
 	outline: none;
 	font-size: 16px;
@@ -50,7 +48,7 @@ body {
 }
 
 .fieldText {
-	margin-top: 10px;
+	margin-top: 15px;
 	font-size: 19px;
 	padding: 5px;
 }
@@ -61,7 +59,7 @@ body {
 	border-radius: 10px;
 	padding: 5px;
 	display: block;
-	width: 200px;
+	width: 230px;
 }
 
 .fieldColorButton {
@@ -80,6 +78,73 @@ body {
 	display: inline;
 }
 
+.animationContainer {
+	margin-top: 10px;
+	border: 5px solid lightgray;
+	border-radius: 10px;
+	padding: 5px;
+	display: block;
+	width: 230px;
+}
+
+.animationButton {
+	display: block;
+	float: right;
+	font-size: 20px;
+	margin-top: auto;
+	color: rgba(0,0,0,0.8);
+	margin-bottom: 0px;
+}
+
+.animationText {
+	font-size: 19px;
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: 5px;
+	display: inline;
+}
+
 .fieldSubContainer {
 	display: none;
+	background-color: rgba(255,255,255,0.4);
+}
+
+.sliderContainer {
+	padding-top: 5px;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 250px;
+  height: 10px;
+  border-radius: 5px;  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%; 
+  background: black;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: black;
+  cursor: pointer;
+}
+
+.slider:hover {
+  opacity: 1;
 }

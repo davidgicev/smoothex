@@ -9,13 +9,6 @@ function createField() {
 	input.className = "fieldInput"
 	input.placeholder = "insert expression"
 	input.spellcheck = 0
-	input.onfocus = () => {
-		hideInfo()
-		if(element.id != -1) {
-			container.style.display = "block"
-			skrieni = 0
-		}
-	}
 
 	let container = document.createElement("div")
 	container.className = "fieldSubContainer"
@@ -34,13 +27,60 @@ function createField() {
 	colorButton.innerHTML = '<i class="far fa-edit"></i>'
 	colorButton.className = "fieldColorButton"
 
+	let sliderContainer = document.createElement("div")
+	let slider = document.createElement("input")
+	slider.type = "range"
+	slider.min = -5
+	slider.max = 5
+	slider.value = 0
+	slider.step = 0.1
+	sliderContainer.appendChild(slider)
+	slider.className = "slider"
+	sliderContainer.className = "sliderContainer"
+
+	let animationContainer = document.createElement("div")
+	animationContainer.className = "animationContainer"
+
+	let animationText = document.createElement("div")
+	animationText.className = "animationText"
+	animationText.innerHTML = "Animate"
+
+	let animationButton = document.createElement("div")
+	animationButton.innerHTML = '<i class="far fa-play-circle"></i>'
+	animationButton.className = "animationButton"
+	animationButton.name = ""
+
+	slider.oninput = () => {
+		let inputValue = input.value
+		input.value = inputValue.substring(0, inputValue.indexOf("=") + 1) + " " + slider.value;
+		text.innerHTML = "Value: " + slider.value;
+		variables[contains(variables, "name", slider.id.substring(2))].value = Number(slider.value)
+		draw()
+	}
+
+	animationButton.onclick = () => {
+		if(!animationButton.name) {
+			animations.splice(contains(animations, "id", animationButton.name))
+			return
+		}
+		animationButton.name = ''
+		animations.push(animateVariable(slider.id))
+		animate()
+	}
+
 	color.onclick = () => {
-		let input = prompt("Color")
-		if(!input)
-			input = getRandomColor()
-		fields[element.id].color = input
-		functions[fields[element.id].id].color = input
-		color.style.borderColor = input
+
+		let pickedColor = prompt("Color")
+
+		if(!pickedColor)
+			pickedColor = getRandomColor()
+
+		let value = input.value
+		value = parseInput(value).name
+
+		let index = contains(functions, "name", value)
+		functions[index].color = pickedColor
+		color.style.borderColor = pickedColor
 		draw()
 	}
 
@@ -50,194 +90,102 @@ function createField() {
 			return
 		}
 
+		zapamti = this
+
   	event.preventDefault()
 
-  	let id = this.parentElement.id
+  	console.log("=======================================================================")
 
-  	let inputEmpty = this.value == ""
+  	if(transitions.length)
+  		return
 
-  	if(id == -1 && !inputEmpty) {
-  		
-  		let object = parseInput(this.value)
+  	let novi = []
 
-  		if(!object) {
-  			alert("Neshto ne e u red")
-  			return
+  	let children = this.parentElement.parentElement.children
+
+  	for(let i=0; i<children.length; i++) {
+  		if(children[i].children[0].value) {
+  			novi.push(children[i].children[0].value)
   		}
-
-  		id = getFreeId()
-
-  		fields[id] = object
-
-  		if(fields[id].f) {
-
-  			if(contains(functions, "name", object.name)) {
-  				alert("Vekje definirano")
-  				return
-  			}
-
-  			fields[id] = object
-  			object.id = functions.length
-  			functions.push(object)
-
-  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
-  			this.nextSibling.children[1].style.borderColor = object.color
-
-  			animations.push(drawFunctionInit(object))
-  		}
-  		else {
-
-  			if(contains(variables, "name", object.name)) {
-  				alert("Vekje definirano")
-  				return
-  			}
-
-  			fields[id] = object
-  			object.id = variables.length
-  			variables.push(object)
-
-  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
-  			this.nextSibling.children[1].style.display = "none"
-
-  			draw()
-  		}
-
-  		container.style.display = "block"
-  		skrieni = 0
-
-  		this.parentElement.id = id
-
-  		animate()
+  		else
+  			novi.push("")
   	}
-  	else if(id != -1 && !inputEmpty){
 
-  		let object = parseInput(this.value)
+  	let results = processInputs(novi)
 
-  		object.id = fields[id].id
-
-  		if(!fields[id].f == !object.f) {
-
-  			if(fields[id].f) {
-
-  				if(fields[id].name == object.name || !isNaN(fields[id].name[0]) && !isNaN(object.name[0])) {
-
-  					object.color = fields[id].color
-  					animations.push(drawFunctionTransition(fields[id], object))
-  					fields[id] = object
-
-  					this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
-  				}
-  				else {
-
-  					animations.push(drawFunctionClosure(functions[fields[id].id]))
-	  				fields[id] = null
-
-	  				id = getFreeId()
-	  				fields[id] = object
-		  			object.id = functions.length
-		  			functions.push(object)
-
-		  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
-		  			this.nextSibling.children[1].style.borderColor = object.color
-
-	  				animations.push(drawFunctionInit(object))
-  				}
-
-  			}
-  			else {
-
-				fields[id] = object
-  	  			variables[fields[id].id] = object
-
-  	  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
-
-  	  			draw()
-  			}
+  	for(let i=0; i<results.length; i++) {
+  		if(results[i] === 1)
+  			children[i].children[0].style.backgroundColor = "rgba(255,255,255,0.7)"
+  		else if (results[i]) {
+  			this.value = results[i] + "(x) = " + this.value
+  			children[i].children[0].style.backgroundColor = "rgba(255,255,255,0.7)"
   		}
-  		else {
-
-
-	  		if(!fields[id].f) {
-
-	  			variables.splice(fields[id].id)
-
-	  			fields[id] = object
-
-	  			if(contains(functions, "name", object.name)) {
-	  				alert("Vekje definirano")
-	  				return
-	  			}
-
-	  			fields[id] = object
-	  			object.id = functions.length
-	  			functions.push(object)
-
-	  			this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
-	  			this.nextSibling.children[1].style.borderColor = object.color
-
-	  			animations.push(drawFunctionInit(object))
-  				this.nextSibling.children[1].style.display = "block"
-
-	  		}
-	  		else {
-
-	  			if(contains(variables, "name", object.name)) {
-	  				alert("Vekje definirano")
-	  				return
-	  			}
-
-	  			animations.push(drawFunctionClosure(functions[fields[id].id]))
-
-	  			fields[id] = object
-	  			object.id = variables.length
-	  			variables.push(object)
-
-	  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
-	  			this.nextSibling.children[1].style.display = "none"
-	  			draw()
-	  		}
-
-  		}
-
-  		this.parentElement.id = id
-			
-  		animate()
-  	}
-  	else {
-
-  		if(fields[id].f) {
-
-	  		animations.push(drawFunctionClosure(functions[fields[id].id]))
-
-	  		fields[id] = null
-
-  			animate()
-
-
-	  		this.nextSibling.children[1].style.borderColor = "transparent"
-  		
-  		}
-  		else {
-
-  			variables.splice(fields[id].id, 1)
-  			fields[id] = null
-  		}
-
-			this.parentElement.id = -1
-
-  		this.blur()
-  		container.style.display = "none"
+  		else
+  			children[i].children[0].style.backgroundColor = "rgba(240,20,60,0.4)"
   	}
 
   	checkAddField()
   	draw()
 
+  	this.blur()
+  	this.focus()
+
 	});
+
+	input.addEventListener("focus", function (event) {
+
+		hideInfo()
+
+		if(!this.value)
+			return
+
+		let object = parseInput(this.value)
+
+		if(!object) {
+			return
+		}
+
+		if(object.f) {
+
+			this.nextSibling.children[0].innerHTML = "Parsed: " + object.readable
+
+			console.log(functions)
+
+			let index = contains(functions, "name", object.name)
+
+			this.nextSibling.children[1].style.borderColor = functions[index].color
+  			this.nextSibling.children[2].style.display = "none"
+  			this.nextSibling.children[3].style.display = "none"
+		}
+		else {
+  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+  			this.nextSibling.children[1].style.display = "none"
+  			this.nextSibling.children[2].children[0].value = object.value
+  			this.nextSibling.children[2].children[0].id = "1_" + object.name
+  			this.nextSibling.children[3].children[1].name = "1_" + object.name
+		}
+
+		zapamti = this
+
+		this.nextSibling.style.display = "block"
+
+	});
+
+
+	  			// this.nextSibling.children[0].innerHTML = "Parsed: "+object.readable
+	  			// this.nextSibling.children[1].style.borderColor = object.color
+
+	  			// start(drawFunctionInit(object))
+  				// this.nextSibling.children[1].style.display = "block"
 
 	container.appendChild(text)
 	color.appendChild(colorText)
 	color.appendChild(colorButton)
 	container.appendChild(color)
+	container.appendChild(sliderContainer)
+	animationContainer.appendChild(animationText)
+	animationContainer.appendChild(animationButton)
+	container.appendChild(animationContainer)
 	element.appendChild(input)
 	element.appendChild(container)
 	document.getElementById("commandContainer").appendChild(element)
@@ -246,14 +194,8 @@ function createField() {
 function checkAddField() {
 	
 	let children = document.getElementById("commandContainer").children
-	let br = 0
 
-	for(let i=0; i<children.length; i++) {
-		if(children[i].id == -1)
-			br++
-	}
-
-	if(br == 0)
+	if(children.length < functions.length + variables.length - 2)
 		createField()
 }
 
@@ -264,8 +206,44 @@ function roundToNumber(toRound, number) {
 function nearestTen(number) {
 	number = Math.abs(number)
 	return Math.pow(2, Math.floor( Math.log(number)/Math.log(2) ));
-	if(broj > 5 || broj < 0.26)
-		return Math.pow(10, Math.floor( Math.log(number)/Math.log(10) ))
-	else
-		return broj
+}
+
+function getFreeName() {
+
+	let letters = "fgh"
+
+	for(let i=0; i<letters.length; i++) {
+		if(contains(functions, "name", letters[i]) == -1)
+			return letters[i]
+	}
+
+	let i = 1
+
+	while(contains(functions, "name", "f"+i) != -1)
+		i++
+
+	return "f"+i;
+}
+
+function enableInputs() {
+
+	let fields = document.getElementById("commandContainer").children
+
+	for(let i=0; i<fields.length; i++) {
+		fields[i].children[0].disabled = false
+		fields[i].children[0].style.color = "black"
+	}
+
+	zapamti.focus()
+}
+
+
+function disableInputs() {
+
+	let fields = document.getElementById("commandContainer").children
+
+	for(let i=0; i<fields.length; i++) {
+		fields[i].children[0].disabled = true
+		fields[i].children[0].style.color = "rgba(0,0,0,0.7)"
+	}
 }

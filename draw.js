@@ -1,7 +1,7 @@
 function draw() {
 	drawAxes()
 	drawGrid()
-	requestAnimationFrame(drawFunctions)
+	drawFunctions()
 }
 
 function drawFunctions() {
@@ -146,7 +146,7 @@ function drawFunction(f) {
 
 	//let vreme = (new Date()).getTime()
 
-	if(!f || f.hidden) {
+	if(!f || f.hidden || !f.f) {
 		return
 	}
 
@@ -162,7 +162,6 @@ function drawFunction(f) {
 
 	let x = i
 	let y = -f(x)
-
 
 	i += nIncrement
 
@@ -283,6 +282,8 @@ function drawFunctionInit(f) {
 
 	f.hidden = true
 
+	functions.push(f)
+
 	let funkcija = function() {
 
 		if(this.smooth > 1) {
@@ -308,14 +309,16 @@ function drawFunctionInit(f) {
 
 function drawFunctionTransition(f1, f2) {
 
-	f1.hidden = true
+	functions[f1.id].hidden   = true
+	functions[f1.id].f        = f2.f
+	functions[f1.id].readable = f2.readable	
+
 	draw()
 
 	let funkcija = function() {
 
 		if(this.smooth >= 1) {
 
-			functions[f1.id] = f2;
 			functions[f1.id].hidden = false
 
 			draw()
@@ -343,9 +346,6 @@ function drawFunctionTransition(f1, f2) {
 
 function drawFunctionClosure(f) {
 
-	f.hidden = true
-	functions.splice(f.id, 1)
-
 	let funkcija = function() {
 
 		if(this.smooth > 1) {
@@ -363,7 +363,7 @@ function drawFunctionClosure(f) {
 
 		drawFunction(funk)
 
-		this.smooth += 0.01*(INTERVAL/(1000/60))
+		this.smooth += 0.02*(INTERVAL/(1000/60))
 	}
 
 	return funkcija.bind({smooth:0});
@@ -374,4 +374,72 @@ function getFreeId() {
 		if(fields[i] == null)
 			return i
 	return fields.length
+}
+
+function animateVariable(sliderId) {
+
+	let index = contains(variables, "name", sliderId.substring(2))
+	let element = document.getElementById(sliderId)
+
+	let funkcija = {
+		f: function() {
+
+			if(this.period > 10) {
+				enableInputs()
+				return -1
+			}
+
+
+			variables[index].value = this.period
+			element.parentElement.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
+			element.parentElement.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
+			element.value = this.period
+
+			draw()
+
+			this.period += 0.01
+		},
+		id: sliderId
+	}
+
+	funkcija.f = funkcija.f.bind({period: variables[index].value})
+
+	return funkcija;
+}
+
+function animateXInterval() {
+	let funkcija = {
+		f: function() {
+
+			if(this.period > 10) {
+
+				return -1
+			}
+
+			//document.getElementById(sliderId)
+
+			xInterval = this.period
+
+			draw()
+
+			this.period += 0.01
+		},
+		id: -1
+	}
+
+	funkcija.f = funkcija.f.bind({period:xInterval})
+
+	animations.push(funkcija)
+	animate()
+}
+
+function drawTangent() {
+
+	functions.push({
+		name: "derivative",
+		f: x => Math.cos(xInterval-5)*(x-xInterval-5) + Math.sin(xInterval-5),
+		color: "blue",
+	})
+
+	animateXInterval()
 }

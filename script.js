@@ -9,7 +9,6 @@ canvas.height = windowHeight
 var xAxis = windowHeight/2
 var screenWidth = windowWidth
 var commandContainerRatio = 0.2
-var zoom = 1
 var scale = Math.max(windowWidth, windowHeight)/13
 var xInterval = -windowWidth/scale/2 - windowWidth*commandContainerRatio/scale/2
 var yInterval = -windowHeight/scale/2
@@ -52,10 +51,10 @@ var functions = [{
 	},
 	{
 		name: "cotan",
-		f: Math.cotan
+		f: x => 1/Math.tan(x)
 	}]
 
-var fields = []
+var zapamti;
 
 document.getElementById("window").style.width  = windowWidth  + "px"
 document.getElementById("window").style.height = windowHeight + "px"
@@ -64,7 +63,6 @@ document.getElementById("commandContainer").style.width  = windowWidth*commandCo
 document.getElementById("commandContainer").style.height = windowHeight     + "px"
 
 //document.getElementById("commandContainer").style.backgroundColor = theme.background;
-document.getElementById("screen").style.backgroundColor = theme.background;
 
 initCommands()
 draw()
@@ -107,9 +105,7 @@ document.getElementById("screen").addEventListener("mousedown", (event) => {
 	lastMouseX = mouseX
 	lastMouseY = mouseY
 	isMouseDown = true
-	if(!skrieni) {
-		hideInfo()
-	}
+	hideInfo()
 })
 
 document.getElementById("screen").addEventListener("mouseup", (event) => {
@@ -118,9 +114,7 @@ document.getElementById("screen").addEventListener("mouseup", (event) => {
 
 document.getElementById("screen").addEventListener("wheel", (event) => {
 
-	let dodadenZoom = -event.deltaY/1000
-
-	zoom -= event.deltaY/1000
+	let dodadenZoom = -0.05*Math.sign(event.deltaY)
 
 	xInterval += mouseX/scale*dodadenZoom
 	yInterval += mouseY/scale*dodadenZoom
@@ -149,11 +143,8 @@ function checkKey(e) {
     if (e.keyCode == '38') {
         // up arrow
 
-        let f2 = prompt("Function")
-		eval("animate(drawFunctionTransition(functions[0], x => " + f2 + ")); functions.pop()")
     }
     else if (e.keyCode == '40') {
-        animate(drawFunctionSmooth({f: x => x*x, color: getRandomColor()}))
         // down arrow
     }
     else
@@ -164,7 +155,47 @@ function getRandomColor() {
   return "hsl("+(Math.random()*300+240)+", 80%, 50%)";
 }
 
+function transition() {
+
+	disableInputs()
+
+	let object = {
+		main: function () {
+
+			currentTime = (new Date()).getTime()
+			delta = currentTime - lastTime;
+
+			if(delta < INTERVAL) {
+				requestAnimationFrame(this.main);
+				return
+			}
+
+			lastTime = currentTime - (delta % INTERVAL)
+
+			if(transitions.length)
+				requestAnimationFrame(this.funk)
+			else {
+				enableInputs()
+				return
+			}
+
+			requestAnimationFrame(this.main)
+		},
+		funk: function() {
+			draw()
+			if(transitions[0]() == -1) {
+				transitions.splice(0, 1)
+			}
+		}
+	}
+	object.main = object.main.bind(object)
+	object.main()
+}
+
 function animate() {
+
+	disableInputs()
+
 	let object = {
 		main: function () {
 
@@ -180,16 +211,18 @@ function animate() {
 
 			if(animations.length)
 				requestAnimationFrame(this.funk)
-			else
+			else {
+				enableInputs()
 				return
+			}
+
 			requestAnimationFrame(this.main)
 		},
 		funk: function() {
 			draw()
 			for(let i=0; i<animations.length; i++) {
-				if(animations[i]() == -1) {
+				if(animations[i].f() == -1)
 					animations.splice(i, 1)
-				}
 			}
 		}
 	}
@@ -198,20 +231,24 @@ function animate() {
 }
 
 var animations = []
+var transitions = []
 
-function refresh(funk) {
+function start(animation) {
 
-	funk()
+	let object = {
+		main: function () {
+			if(this.funk() == -1)
+				return
+			requestAnimationFrame(this.main)
+		},
+		funk: function () {
+			draw()
+			animation()
+		}
+	}
 
-	currentTime = (new Date()).getTime()
-	delta = currentTime - lastTime;
-
-	if(delta < INTERVAL)
-		return;
-
-	lastTime = currentTime - (delta % INTERVAL)
-
-	requestAnimationFrame(refresh, funk)
+	object.main = object.main.bind(object)
+	object.main()
 }
 
 
