@@ -2,13 +2,13 @@ function parseInput(input) {
 
 	input = input.replace(/ /g,'')
 
-	console.log("parseInput: "+input)
+	//console.log("parseInput: "+input)
 
 	let EqualsIndex = input.indexOf("=")
 
 	if(EqualsIndex == -1 || input.indexOf("(x)") != -1 && input.indexOf("(x)") == EqualsIndex - 3) {
 		// f(x) = neshto
-		console.log("f(x) = neshto")
+		//console.log("f(x) = neshto")
 
 		let name = EqualsIndex == -1 ? getFreeName() : input.substring(0, EqualsIndex - 3)
 		
@@ -23,10 +23,10 @@ function parseInput(input) {
 		let result = parseExpression(input.substring(EqualsIndex + 1))
 
 		try {			
-			console.log("object.f = x => " + result.parsed)
+			//console.log("object.f = x => " + result.parsed)
 			eval("object.f = x => " + result.parsed)
 		}catch(e) {
-			console.log("Invalid Input:")
+			//console.log("Invalid Input:")
 			console.log(e)
 			if(e)
 				return 0;
@@ -39,7 +39,7 @@ function parseInput(input) {
 	else if(input.indexOf("(x)") == -1 || input.indexOf("(x)") > EqualsIndex) {
 		// a = neshto
 
-		console.log("a = neshto")
+		//console.log("a = neshto")
 
 		let name = input.substring(0,EqualsIndex)
 
@@ -74,13 +74,13 @@ function parseExpression(input) {
 
 	input = input.replace(/ /g,'')
 
-	console.log("parseExpression: "+input)
-	console.log("Rabotam so ")
-	console.log(functions)
-	console.log(variables)
+	// console.log("parseExpression: "+input)
+	// console.log("Rabotam so ")
+	// console.log(functions)
+	// console.log(variables)
 
 	let targets = findObjects(input)
-	console.log(targets)
+	// console.log(targets)
 	let completed = ""
 	let readable = ""
 
@@ -191,7 +191,7 @@ function parseExpression(input) {
 		}
 	}
 
-	console.log("finished parseExpression: "+completed)
+	//console.log("finished parseExpression: "+completed)
 
 	return {
 		parsed: completed,
@@ -322,8 +322,8 @@ function processInputs(inputs) {
 	let functionsCopy = [... functions]
 	let variablesCopy = [... variables]
 
-	functions = functions.slice(0,4)
-	variables = [variables[0]]
+	functions  = [... builtInFunctions]
+	variables  = [... builtInVariables]
 
 	let results = []
 
@@ -348,7 +348,7 @@ function processInputs(inputs) {
 
 		if(object.f) {
 
-			console.log("Funkcija e")
+			// console.log("Funkcija e")
 
 			let index = contains(functionsCopy, "name", object.name)
 
@@ -361,18 +361,18 @@ function processInputs(inputs) {
 
 			if(index != -1) {
 
-				console.log("Postoi funkcijata")
+				// console.log("Postoi funkcijata")
 
 				if(functionsCopy[index].readable == object.readable) {
-					console.log("Nema potreba da se updatira")
+					// console.log("Nema potreba da se updatira")
 					functions.push(functionsCopy[index]) 
 					continue
 				}
 
-				console.log("Se updatira")
+				// console.log("Se updatira")
 
 				if(!parseExpression(functionsCopy[index].readable).readable) {
-					console.log("Nevaliden pochetok na tranzicija")
+					// console.log("Nevaliden pochetok na tranzicija")
 					transitions.push(drawFunctionInit(object))
 					continue
 				}
@@ -385,7 +385,7 @@ function processInputs(inputs) {
 				transitions.push(drawFunctionTransition({...functionsCopy[index], id: index}, object))
 			}
 			else {
-				console.log("Ne postoi i se pravi nova")
+				// console.log("Ne postoi i se pravi nova")
 				transitions.push(drawFunctionInit(object))
 			}
 		}

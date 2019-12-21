@@ -2,6 +2,8 @@ function draw() {
 	drawAxes()
 	drawGrid()
 	drawFunctions()
+	variables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
+	builtInVariables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
 }
 
 function drawFunctions() {
@@ -369,12 +371,6 @@ function drawFunctionClosure(f) {
 	return funkcija.bind({smooth:0});
 }
 
-function getFreeId() {
-	for(let i=0; i<fields.length; i++)
-		if(fields[i] == null)
-			return i
-	return fields.length
-}
 
 function animateVariable(animationContainer) {
 
