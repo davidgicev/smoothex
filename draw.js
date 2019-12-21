@@ -384,7 +384,6 @@ function animateVariable(animationContainer) {
 		f: function() {
 
 			if(this.period > 10) {
-				enableInputs()
 				return -1
 			}
 
@@ -392,7 +391,7 @@ function animateVariable(animationContainer) {
 			variables[index].value = this.period
 			animationContainer.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
 			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
-			animationContainer.children[0].value = this.period
+			animationContainer.parentElement.children[2].children[0].value = this.period
 
 			this.period += 0.01
 		},
