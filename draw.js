@@ -376,10 +376,9 @@ function getFreeId() {
 	return fields.length
 }
 
-function animateVariable(sliderId) {
+function animateVariable(animationContainer) {
 
-	let index = contains(variables, "name", sliderId.substring(2))
-	let element = document.getElementById(sliderId)
+	let index = contains(variables, "name", animationContainer.name)
 
 	let funkcija = {
 		f: function() {
@@ -391,15 +390,13 @@ function animateVariable(sliderId) {
 
 
 			variables[index].value = this.period
-			element.parentElement.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
-			element.parentElement.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
-			element.value = this.period
-
-			draw()
+			animationContainer.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
+			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
+			animationContainer.children[0].value = this.period
 
 			this.period += 0.01
 		},
-		id: sliderId
+		id: animationContainer.name
 	}
 
 	funkcija.f = funkcija.f.bind({period: variables[index].value})
@@ -419,8 +416,6 @@ function animateXInterval() {
 			//document.getElementById(sliderId)
 
 			xInterval = this.period
-
-			draw()
 
 			this.period += 0.01
 		},

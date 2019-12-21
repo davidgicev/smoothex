@@ -6,8 +6,9 @@ function parseInput(input) {
 
 	let EqualsIndex = input.indexOf("=")
 
-	if(EqualsIndex == -1 || input.indexOf("(x)") == EqualsIndex - 3) {
+	if(EqualsIndex == -1 || input.indexOf("(x)") != -1 && input.indexOf("(x)") == EqualsIndex - 3) {
 		// f(x) = neshto
+		console.log("f(x) = neshto")
 
 		let name = EqualsIndex == -1 ? getFreeName() : input.substring(0, EqualsIndex - 3)
 		
@@ -37,6 +38,8 @@ function parseInput(input) {
 	}
 	else if(input.indexOf("(x)") == -1 || input.indexOf("(x)") > EqualsIndex) {
 		// a = neshto
+
+		console.log("a = neshto")
 
 		let name = input.substring(0,EqualsIndex)
 
@@ -77,7 +80,7 @@ function parseExpression(input) {
 	console.log(variables)
 
 	let targets = findObjects(input)
-	// console.log(targets)
+	console.log(targets)
 	let completed = ""
 	let readable = ""
 
@@ -264,7 +267,12 @@ function findNext(input, startIndex) {
 
 		index = input.indexOf(functions[i].name)
 
-		if(index != -1 && index < minIndexFunction) {
+		if(index != -1 && index <= minIndexFunction) {
+
+			if(index == minIndexFunction)
+				if(functions[i].name.length < functions[functionIndex].name.length)
+					continue
+	
 			minIndexFunction = index
 			functionIndex = i
 		}
@@ -277,7 +285,12 @@ function findNext(input, startIndex) {
 
 		index = input.indexOf(variables[i].name)
 
-		if(index != -1 && index < minIndexVariable) {
+		if(index != -1 && index <= minIndexVariable) {
+
+			if(index == minIndexVariable)
+				if(variables[i].name.length < variables[variableIndex].name.length)
+					continue
+
 			minIndexVariable = index
 			variableIndex = i
 		}

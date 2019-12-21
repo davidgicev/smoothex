@@ -194,8 +194,6 @@ function transition() {
 
 function animate() {
 
-	disableInputs()
-
 	let object = {
 		main: function () {
 
@@ -212,7 +210,6 @@ function animate() {
 			if(animations.length)
 				requestAnimationFrame(this.funk)
 			else {
-				enableInputs()
 				return
 			}
 

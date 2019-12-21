@@ -59,12 +59,14 @@ function createField() {
 	}
 
 	animationButton.onclick = () => {
-		if(!animationButton.name) {
-			animations.splice(contains(animations, "id", animationButton.name))
-			return
-		}
-		animationButton.name = ''
-		animations.push(animateVariable(slider.id))
+
+		let index = contains(animations, "id", animationContainer.name)
+
+		if(index == -1)
+			animations.push(animateVariable(animationContainer))
+		else
+			animations.splice(index, 1)
+
 		animate()
 	}
 
@@ -87,6 +89,17 @@ function createField() {
 	input.addEventListener("keyup", function(event) {
 
 		if (event.keyCode !== 13) {
+			if(event.keyCode === 38) { // up
+				if(this.parentElement.previousSibling) {
+					container.parentElement.parentElement.insertBefore(this.parentElement, this.parentElement.previousSibling)
+				}
+			} 
+			if(event.keyCode === 40) { // down
+				if(this.parentElement.nextSibling) {
+					container.parentElement.parentElement.insertBefore(this.parentElement.nextSibling, this.parentElement)
+				}
+			}
+
 			return
 		}
 
@@ -162,7 +175,7 @@ function createField() {
   			this.nextSibling.children[1].style.display = "none"
   			this.nextSibling.children[2].children[0].value = object.value
   			this.nextSibling.children[2].children[0].id = "1_" + object.name
-  			this.nextSibling.children[3].children[1].name = "1_" + object.name
+  			this.nextSibling.children[3].name = object.name
 		}
 
 		zapamti = this
