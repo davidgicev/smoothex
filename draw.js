@@ -182,7 +182,7 @@ function drawFunction(f) {
 
 	let momentalenIzvod = (-(y2-y)/nIncrement)
 	let starn = nIncrement
-	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 2)
+	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 5)
 	promena = Math.max(1 / promena, 0.01)
 	promena = promena*Math.min(Math.sqrt(screenWidth/scale/12), 5)
 
