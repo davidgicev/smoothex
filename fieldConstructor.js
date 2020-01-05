@@ -175,7 +175,9 @@ function createField() {
   			this.nextSibling.children[1].style.display = "none"
   			this.nextSibling.children[2].children[0].value = object.value
   			this.nextSibling.children[2].children[0].id = "1_" + object.name
+			this.nextSibling.children[2].style.display = "block"
   			this.nextSibling.children[3].name = object.name
+			this.nextSibling.children[3].style.display = "block"
 		}
 
 		zapamti = this
