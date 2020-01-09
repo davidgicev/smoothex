@@ -92,7 +92,7 @@ var zapamti;
 document.getElementById("window").style.width  = windowWidth  + "px"
 document.getElementById("window").style.height = windowHeight + "px"
 
-document.getElementById("commandContainer").style.width  = windowWidth*commandContainerRatio + "px"
+document.getElementById("commandContainer").style.width  = Math.max(windowWidth*commandContainerRatio, 300) + "px"
 document.getElementById("commandContainer").style.height = windowHeight     + "px"
 
 initCommands()
@@ -142,4 +142,19 @@ document.getElementById("screen").addEventListener("wheel", (event) => {
 	draw()
 })	
 
+window.addEventListener("resize", () => {
+	windowWidth  = window.innerWidth;
+	windowHeight = window.innerHeight;
 
+	canvas.width  = windowWidth
+	canvas.height = windowHeight
+
+	scale = Math.max(windowWidth, windowHeight)/13
+
+	document.getElementById("window").style.width  = windowWidth  + "px"
+	document.getElementById("window").style.height = windowHeight + "px"
+
+	document.getElementById("commandContainer").style.width  = Math.max(windowWidth*commandContainerRatio, 300) + "px"
+	document.getElementById("commandContainer").style.height = windowHeight     + "px"
+	draw()
+});

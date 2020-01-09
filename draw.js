@@ -282,26 +282,22 @@ function drawParametric(f) {
 
 function drawFunctionInit(f) {
 
-	f.hidden = true
-
 	functions.push(f)
+
+	let orginalna = f.f;
 
 	let funkcija = function() {
 
 		if(this.smooth > 1) {
-			f.hidden = false
-			drawFunctions()
+
+			f.f = orginalna
+
 			return -1
 		}
 
 		let koef = -2*Math.pow(this.smooth,3)+3*Math.pow(this.smooth, 2)
 
-		let funk = {
-			f: x => f.f(x)*koef,
-			color: f.color
-		}
-
-		drawFunction(funk)
+		f.f =  x => orginalna(x)*koef;
 
 		this.smooth += 0.01*(INTERVAL/(1000/60))
 	}
@@ -311,33 +307,25 @@ function drawFunctionInit(f) {
 
 function drawFunctionTransition(f1, f2) {
 
-	functions[f1.id].hidden   = true
+	let f1Copy = f1.f
+	let f2Copy = f2.f
+
 	functions[f1.id].f        = f2.f
 	functions[f1.id].readable = f2.readable	
-
-	draw()
 
 	let funkcija = function() {
 
 		if(this.smooth >= 1) {
 
-			functions[f1.id].hidden = false
+			functions[f1.id].f = f2Copy
 
-			draw()
-			
 			return -1
 		}
 
 		let koef = -2*Math.pow(this.smooth,3)+3*Math.pow(this.smooth, 2)
 
 
-		let funk = {
-			f: x => f1.f(x) + koef*(f2.f(x) - f1.f(x)),
-			color: f1.color,
-		}
-		
-
-		drawFunction(funk)
+		functions[f1.id].f =  x => f1Copy(x) + koef*(f2Copy(x) - f1Copy(x))
 
 		this.smooth += 0.01*(INTERVAL/(1000/60))
 	}

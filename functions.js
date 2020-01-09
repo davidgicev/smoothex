@@ -98,10 +98,10 @@ function transition() {
 			requestAnimationFrame(this.main)
 		},
 		funk: function() {
-			draw()
 			if(transitions[0]() == -1) {
 				transitions.splice(0, 1)
 			}
+			draw()
 		}
 	}
 	object.main = object.main.bind(object)
