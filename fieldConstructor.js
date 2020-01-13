@@ -27,6 +27,34 @@ function createField() {
 	colorButton.innerHTML = '<i class="far fa-edit"></i>'
 	colorButton.className = "fieldColorButton"
 
+	let colorPalette = document.createElement("div")
+	colorPalette.className = "colorPalette"
+
+	for(let i=0; i<light.colors.length; i++) {
+		
+		let colorOption = document.createElement("div")
+
+		colorOption.className = "colorOption"
+
+		colorOption.style.backgroundColor = light.colors[i]
+
+		colorOption.onclick = () => {
+
+			let pickedColor = light.colors[i]
+			
+			let value = input.value
+			value = parseInput(value).name
+
+			let index = contains(functions, "name", value)
+			functions[index].color = pickedColor
+			color.style.borderColor = pickedColor
+
+			draw()
+		}
+
+		colorPalette.appendChild(colorOption)
+	}
+
 	let sliderContainer = document.createElement("div")
 	let slider = document.createElement("input")
 	slider.type = "range"
@@ -70,20 +98,27 @@ function createField() {
 		animate()
 	}
 
-	color.onclick = () => {
+	colorButton.onclick = () => {
 
-		let pickedColor = prompt("Color")
+		let status = colorPalette.style.display
 
-		if(!pickedColor)
-			pickedColor = getRandomColor()
+		if(status == "block")
+			colorPalette.style.display = "none";
+		else
+			colorPalette.style.display = "block";
 
-		let value = input.value
-		value = parseInput(value).name
+		// let pickedColor = prompt("Color")
 
-		let index = contains(functions, "name", value)
-		functions[index].color = pickedColor
-		color.style.borderColor = pickedColor
-		draw()
+		// if(!pickedColor)
+		// 	pickedColor = getRandomColor()
+
+		// let value = input.value
+		// value = parseInput(value).name
+
+		// let index = contains(functions, "name", value)
+		// functions[index].color = pickedColor
+		// color.style.borderColor = pickedColor
+		// draw()
 	}
 
 	input.addEventListener("keyup", function(event) {
@@ -194,6 +229,7 @@ function createField() {
 	container.appendChild(text)
 	color.appendChild(colorText)
 	color.appendChild(colorButton)
+	color.appendChild(colorPalette)
 	container.appendChild(color)
 	container.appendChild(sliderContainer)
 	animationContainer.appendChild(animationText)

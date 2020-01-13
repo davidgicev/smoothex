@@ -2,7 +2,14 @@ function checkAddField() {
 	
 	let children = document.getElementById("commandContainer").children
 
-	if(children.length < functions.length + variables.length - 2)
+	let br = 0
+
+	for(let i=0; i<children.length; i++) {
+		if(!children[i].children[0].value)
+			br++
+	}
+
+	if(br < 2)
 		createField()
 }
 
@@ -68,7 +75,12 @@ function pan() {
 
 
 function getRandomColor() {
-  return "hsl("+(Math.random()*360)+", 80%, 50%)";
+  
+  let index = Math.floor(Math.random() * light.colors.length)
+
+  return light.colors[index]
+
+  //return "hsl("+(Math.random()*360)+", 80%, 50%)";
 }
 
 function transition() {
@@ -146,8 +158,13 @@ function animate() {
 function hideInfo() {
 	let elements = document.getElementById("commandContainer").children
 	for(let i=0; i<elements.length; i++)
-		if(elements[i].children[1])
+		if(elements[i].children[1]) {
 			elements[i].children[1].style.display = "none"
+			
+			if(elements[i].children[1].children[1].children[2]) {
+				elements[i].children[1].children[1].children[2].style.display = "none"
+			}
+		}
 }
 
 

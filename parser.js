@@ -11,6 +11,9 @@ function parseInput(input) {
 		//console.log("f(x) = neshto")
 
 		let name = EqualsIndex == -1 ? getFreeName() : input.substring(0, EqualsIndex - 3)
+
+		if(!isNaN(name[0]))
+			return 0;
 		
 		let object = {
 			name: name,
@@ -42,6 +45,9 @@ function parseInput(input) {
 		//console.log("a = neshto")
 
 		let name = input.substring(0,EqualsIndex)
+
+		if(!isNaN(name[0]) || name == "x")
+			return 0;
 
 		let object = {
 			name: name,

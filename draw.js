@@ -367,8 +367,8 @@ function animateVariable(animationContainer) {
 	let funkcija = {
 		f: function() {
 
-			if(this.period > 10) {
-				return -1
+			if(this.period > 5 || this.period < -5) {
+				this.direction *= -1
 			}
 
 
@@ -377,12 +377,12 @@ function animateVariable(animationContainer) {
 			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
 			animationContainer.parentElement.children[2].children[0].value = this.period
 
-			this.period += 0.01
+			this.period += this.direction*0.025
 		},
 		id: animationContainer.name
 	}
 
-	funkcija.f = funkcija.f.bind({period: variables[index].value})
+	funkcija.f = funkcija.f.bind({period: variables[index].value, direction: 1})
 
 	return funkcija;
 }

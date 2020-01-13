@@ -29,11 +29,13 @@ var fps = 60;
 var INTERVAL = Math.ceil(1000/fps);
 var currentTime = 0, lastTime = (new Date()).getTime(), delta = 0;
 var isMouseDown;
+var zoom = 1;
 
 var light = {
 	background: "white",
 	axes: "black",
-	font: "gray"
+	font: "gray",
+	colors: ["#8CDEDC", "#2191FB", "#BA274A", "#841C26", "green"]
 }
 
 var dark = {
@@ -133,11 +135,13 @@ document.getElementById("screen").addEventListener("mouseup", (event) => {
 document.getElementById("screen").addEventListener("wheel", (event) => {
 
 	let dodadenZoom = -0.05*Math.sign(event.deltaY)
+	zoom += dodadenZoom
 
 	xInterval += mouseX/scale*dodadenZoom
 	yInterval += mouseY/scale*dodadenZoom
 
 	scale += scale*dodadenZoom
+
 
 	draw()
 })	
