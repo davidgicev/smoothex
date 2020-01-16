@@ -85,6 +85,8 @@ function getRandomColor() {
 
 function transition() {
 
+	animations = []
+
 	disableInputs()
 
 	let object = {

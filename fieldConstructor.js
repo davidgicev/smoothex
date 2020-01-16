@@ -61,7 +61,7 @@ function createField() {
 	slider.min = -5
 	slider.max = 5
 	slider.value = 0
-	slider.step = 0.1
+	slider.step = 0.01
 	sliderContainer.appendChild(slider)
 	slider.className = "slider"
 	sliderContainer.className = "sliderContainer"
@@ -73,20 +73,101 @@ function createField() {
 	animationText.className = "animationText"
 	animationText.innerHTML = "Animate"
 
-	let animationButton = document.createElement("div")
-	animationButton.innerHTML = '<i class="far fa-play-circle"></i>'
-	animationButton.className = "animationButton"
-	animationButton.name = ""
+	let animationToggle = document.createElement("div")
+	animationToggle.innerHTML = '<i class="far fa-play-circle"></i>'
+	animationToggle.className = "animationButton"
+
+	let animationEditContainer = document.createElement("div")
+	animationEditContainer.className = "animationEditContainer"
+	let animationEditButton = document.createElement("div")
+	animationEditButton.innerHTML = '<i class="fas fa-pencil-alt"></i>'
+	animationEditButton.className = "animationEditButton"
+
+	animationEditButton.onclick = () => {
+		let status = animationEditContainer.style.display
+
+		if(status == "block")
+			animationEditContainer.style.display = "none";
+		else
+			animationEditContainer.style.display = "block";
+	}
+
+	let animationEditMin   = document.createElement("div")
+	let animationEditMax   = document.createElement("div")
+	let animationEditSpeed = document.createElement("div")
+	let animationEditStep  = document.createElement("div")
+
+	let animationInputMin  = document.createElement("input")
+	let animationInputMax  = document.createElement("input")
+	let animationInputStep = document.createElement("input")
+
+	let animationInputSpeed = document.createElement("input")
+
+	animationInputMin.type  = "text"
+	animationInputMin.value = -5
+	animationInputMin.onchange = () => {
+		slider.min = Number(animationInputMin.value);
+		slider.value = Number(animationInputMin.value)
+		input.value = animationContainer.name + " = " + slider.value;
+		text.innerHTML = "Value: " + slider.value;
+		variables[contains(variables, "name", animationContainer.name)].value = Number(slider.value)
+		draw()
+	}
+	animationInputMax.type  = "text"
+	animationInputMax.value = 5
+	animationInputMax.onchange = () => {
+		slider.max = Number(animationInputMax.value); 
+		slider.value = Number(animationInputMin.value)
+		input.value = animationContainer.name + " = " + slider.value;
+		text.innerHTML = "Value: " + slider.value;
+		variables[contains(variables, "name", animationContainer.name)].value = Number(slider.value)
+		draw()
+	}
+	animationInputStep.type = "text"
+	animationInputStep.value= 0.1
+
+	animationInputSpeed.type = "range"
+	
+	animationEditMin.appendChild(document.createTextNode("Min "))
+	animationEditMin.appendChild(animationInputMin)
+	animationEditMax.appendChild(document.createTextNode("Max "))
+	animationEditMax.appendChild(animationInputMax)
+	// animationEditStep.appendChild(document.createTextNode("Step "))
+	// animationEditStep.appendChild(animationInputStep)
+
+	animationEditSpeed.appendChild(document.createTextNode("Speed "))
+	animationInputSpeed.min  = 1
+	animationInputSpeed.max  = 10
+	// animationInputSpeed.step = 1
+	animationInputSpeed.value= 5
+	animationInputSpeed.onchange = () => {
+		let index = contains(animations, "id", animationContainer.name)
+
+		if(index != -1) {
+			animations.splice(index, 1)
+			animations.push(animateVariable(animationContainer))
+		}
+
+		animate()
+	}
+	animationInputSpeed.className = "slider"
+	animationEditSpeed.className  = "sliderContainer"
+	animationEditSpeed.appendChild(animationInputSpeed)
+
+	animationEditContainer.appendChild(animationEditMin)
+	animationEditContainer.appendChild(animationEditMax)
+	// animationEditContainer.appendChild(animationEditStep)
+	animationEditContainer.appendChild(animationEditSpeed)
 
 	slider.oninput = () => {
 		let inputValue = input.value
-		input.value = inputValue.substring(0, inputValue.indexOf("=") + 1) + " " + slider.value;
+		input.value = animationContainer.name + " = " + slider.value;
 		text.innerHTML = "Value: " + slider.value;
-		variables[contains(variables, "name", slider.id.substring(2))].value = Number(slider.value)
+		variables[contains(variables, "name", animationContainer.name)].value = Number(slider.value)
 		draw()
 	}
 
-	animationButton.onclick = () => {
+	animationToggle.onclick = () => {
 
 		let index = contains(animations, "id", animationContainer.name)
 
@@ -233,7 +314,9 @@ function createField() {
 	container.appendChild(color)
 	container.appendChild(sliderContainer)
 	animationContainer.appendChild(animationText)
-	animationContainer.appendChild(animationButton)
+	animationContainer.appendChild(animationToggle)
+	animationContainer.appendChild(animationEditButton)
+	animationContainer.appendChild(animationEditContainer)
 	container.appendChild(animationContainer)
 	element.appendChild(input)
 	element.appendChild(container)

@@ -364,25 +364,34 @@ function animateVariable(animationContainer) {
 
 	let index = contains(variables, "name", animationContainer.name)
 
+	let min = animationContainer.children[3].children[0].children[0].value
+	min = Number(min)
+	let max = animationContainer.children[3].children[1].children[0].value
+	max = Number(max)
+	// let step = animationContainer.children[3].children[2].children[0].value
+	// step = Number(step)
+	let speed = animationContainer.children[3].children[2].children[0].value
+	speed = Number(speed)
+
+
 	let funkcija = {
 		f: function() {
 
-			if(this.period > 5 || this.period < -5) {
-				this.direction *= -1
+			if(this.period > max || this.period < min) {
+				this.speed *= -1
 			}
-
 
 			variables[index].value = this.period
 			animationContainer.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
 			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
 			animationContainer.parentElement.children[2].children[0].value = this.period
 
-			this.period += this.direction*0.025
+			this.period += this.speed*0.005
 		},
 		id: animationContainer.name
 	}
 
-	funkcija.f = funkcija.f.bind({period: variables[index].value, direction: 1})
+	funkcija.f = funkcija.f.bind({period: variables[index].value, speed: speed})
 
 	return funkcija;
 }

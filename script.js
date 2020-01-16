@@ -147,13 +147,15 @@ document.getElementById("screen").addEventListener("wheel", (event) => {
 })	
 
 window.addEventListener("resize", () => {
+
 	windowWidth  = window.innerWidth;
 	windowHeight = window.innerHeight;
+	screenWidth = windowWidth
 
 	canvas.width  = windowWidth
 	canvas.height = windowHeight
 
-	scale = Math.max(windowWidth, windowHeight)/13
+	//scale = Math.max(windowWidth, windowHeight)/13
 
 	document.getElementById("window").style.width  = windowWidth  + "px"
 	document.getElementById("window").style.height = windowHeight + "px"

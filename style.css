@@ -84,18 +84,28 @@ body {
 	margin-top: 10px;
 	border: 5px solid lightgray;
 	border-radius: 10px;
-	padding: 5px;
+	padding: 10px;
 	display: block;
-	width: 230px;
+	width: 220px;
 }
 
 .animationButton {
 	display: block;
 	float: right;
-	font-size: 20px;
+	font-size: 21px;
 	margin-top: auto;
 	color: rgba(0,0,0,0.8);
 	margin-bottom: 0px;
+}
+
+.animationEditButton {
+	display: block;
+	float: right;
+	font-size: 19px;
+	margin-top: auto;
+	color: rgba(0,0,0,0.8);
+	margin-bottom: 0px;
+	margin-right: 12px;
 }
 
 .animationText {
@@ -164,4 +174,34 @@ body {
 	display: inline-block;
 	padding: 5px;
 	margin: 5px;
+}
+
+.animationEditContainer {
+	display: none;
+	padding: 10px;
+}
+
+.animationEditContainer div {
+	margin-top: 20px;
+	font-size: 17px;
+}
+
+.animationEditContainer div input {
+	width: 40px;
+	border: none;
+	margin-left: 5px;
+	text-align: center;
+	font-family: Arial;
+}
+
+.animationEditContainer div input[type=text] {
+	outline: none;
+	border: none;
+	border-bottom: 1px solid black;
+}
+
+.animationEditContainer div input[type=range] {
+	margin-top: 5px;
+	margin-left: 10px;
+	width: 70px;
 }
