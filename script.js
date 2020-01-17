@@ -135,7 +135,8 @@ document.getElementById("screen").addEventListener("mouseup", (event) => {
 document.getElementById("screen").addEventListener("wheel", (event) => {
 
 	let dodadenZoom = -0.05*Math.sign(event.deltaY)
-	zoom += dodadenZoom
+	zoom += zoom*dodadenZoom
+	// console.log(zoom)
 
 	xInterval += mouseX/scale*dodadenZoom
 	yInterval += mouseY/scale*dodadenZoom

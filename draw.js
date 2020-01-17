@@ -184,10 +184,10 @@ function drawFunction(f) {
 	let starn = nIncrement
 	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 5)
 	promena = Math.max(1 / promena, 0.01)
-	promena = promena*Math.min(Math.sqrt(screenWidth/scale/12), 5)
+	promena = promena*Math.min(1/(zoom), 5)
 
 
-	// let zaRender = (momentalenIzvod - minatIzvod)/nIncrement
+	// let zaRender = promena*10//(momentalenIzvod - minatIzvod)/nIncrement
 
 	nIncrement = promena
 
@@ -195,15 +195,17 @@ function drawFunction(f) {
 
 	if(starn > nIncrement) {
 
+	
+
+		i = i - starn
+		continue
+	}
+
 	// ctx.fillStyle = "red"
 
 	// ctx.beginPath()
 	// ctx.arc(renderX,  (y - yInterval)*scale, 10, 0, 2*3.14);
 	// ctx.fill()
-
-		i = i - starn
-		continue
-	}
 
 	// ctx.fillStyle = "black"
 
