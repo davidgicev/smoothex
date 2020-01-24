@@ -35,7 +35,7 @@ var light = {
 	background: "white",
 	axes: "black",
 	font: "gray",
-	colors: ["transparent","#8CDEDC", "#2191FB", "#BA274A", "indigo", "green"]
+	colors: ["transparent","#8CDEDC", "#2191FB", "#de214e", "indigo", "green"]
 }
 
 var dark = {

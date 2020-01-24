@@ -387,7 +387,7 @@ function animateVariable(animationContainer) {
 			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
 			animationContainer.parentElement.children[2].children[0].value = this.period
 
-			this.period += this.speed*0.005
+			this.period += this.speed*0.005*((max-min)/10)
 		},
 		id: animationContainer.name,
 		speed: speed,
