@@ -35,7 +35,7 @@ var light = {
 	background: "white",
 	axes: "black",
 	font: "gray",
-	colors: ["#8CDEDC", "#2191FB", "#BA274A", "#841C26", "green"]
+	colors: ["transparent","#8CDEDC", "#2191FB", "#BA274A", "indigo", "green"]
 }
 
 var dark = {
@@ -64,6 +64,18 @@ var builtInFunctions = [{
 	{
 		name: "cotan",
 		f: x => 1/Math.tan(x)
+	},
+	{
+		name: "abs",
+		f: Math.abs
+	},
+	{
+		name: "sqrt",
+		f: Math.sqrt
+	},
+	{
+		name: "ln",
+		f: Math.log
 	}
 ]
 

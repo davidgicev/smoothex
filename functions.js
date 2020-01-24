@@ -76,7 +76,7 @@ function pan() {
 
 function getRandomColor() {
   
-  let index = Math.floor(Math.random() * light.colors.length)
+  let index = 1 + Math.floor(Math.random() * (light.colors.length-1))
 
   return light.colors[index]
 
@@ -175,4 +175,19 @@ function getFreeId() {
 		if(fields[i] == null)
 			return i
 	return fields.length
+}
+
+function stopAnimation(animationContainer) {
+
+	let index = contains(animations, "id", animationContainer.name);
+
+	if(index == -1)
+		return
+
+	animations.splice(index, 1);
+
+	animationContainer.children[1].innerHTML = '<i class="far fa-play-circle"></i>'
+
+	// animations.push(animateVariable(container))
+
 }

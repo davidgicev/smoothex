@@ -8,7 +8,7 @@ function draw() {
 
 function drawFunctions() {
 
-	for (let i=4; i<functions.length; i++) {
+	for (let i=7; i<functions.length; i++) {
 		drawFunction(functions[i])
 	}
 }
@@ -182,7 +182,7 @@ function drawFunction(f) {
 
 	let momentalenIzvod = (-(y2-y)/nIncrement)
 	let starn = nIncrement
-	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 5)
+	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 10)
 	promena = Math.max(1 / promena, 0.01)
 	promena = promena*Math.min(1/(zoom), 5)
 
@@ -375,7 +375,6 @@ function animateVariable(animationContainer) {
 	let speed = animationContainer.children[3].children[2].children[0].value
 	speed = Number(speed)
 
-
 	let funkcija = {
 		f: function() {
 
@@ -390,10 +389,12 @@ function animateVariable(animationContainer) {
 
 			this.period += this.speed*0.005
 		},
-		id: animationContainer.name
+		id: animationContainer.name,
+		speed: speed,
+		period: variables[index].value
 	}
 
-	funkcija.f = funkcija.f.bind({period: variables[index].value, speed: speed})
+	funkcija.f = funkcija.f.bind(funkcija)
 
 	return funkcija;
 }

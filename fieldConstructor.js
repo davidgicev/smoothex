@@ -105,22 +105,24 @@ function createField() {
 
 	animationInputMin.type  = "text"
 	animationInputMin.value = -5
-	animationInputMin.onchange = () => {
+	animationInputMin.oninput = () => {
 		slider.min = Number(animationInputMin.value);
 		slider.value = Number(animationInputMin.value)
 		input.value = animationContainer.name + " = " + slider.value;
 		text.innerHTML = "Value: " + slider.value;
 		variables[contains(variables, "name", animationContainer.name)].value = Number(slider.value)
+		stopAnimation(animationContainer);
 		draw()
 	}
 	animationInputMax.type  = "text"
 	animationInputMax.value = 5
-	animationInputMax.onchange = () => {
+	animationInputMax.oninput = () => {
 		slider.max = Number(animationInputMax.value); 
 		slider.value = Number(animationInputMin.value)
 		input.value = animationContainer.name + " = " + slider.value;
 		text.innerHTML = "Value: " + slider.value;
 		variables[contains(variables, "name", animationContainer.name)].value = Number(slider.value)
+		stopAnimation(animationContainer)
 		draw()
 	}
 	animationInputStep.type = "text"
@@ -140,12 +142,11 @@ function createField() {
 	animationInputSpeed.max  = 10
 	// animationInputSpeed.step = 1
 	animationInputSpeed.value= 5
-	animationInputSpeed.onchange = () => {
+	animationInputSpeed.oninput = () => {
 		let index = contains(animations, "id", animationContainer.name)
 
 		if(index != -1) {
-			animations.splice(index, 1)
-			animations.push(animateVariable(animationContainer))
+			animations[index].speed = Math.sign(animations[index].speed)*animationInputSpeed.value
 		}
 
 		animate()
@@ -160,6 +161,10 @@ function createField() {
 	animationEditContainer.appendChild(animationEditSpeed)
 
 	slider.oninput = () => {
+
+		if(contains(animations, 'id', animationContainer.name) != -1)
+			stopAnimation(animationContainer)
+
 		let inputValue = input.value
 		input.value = animationContainer.name + " = " + slider.value;
 		text.innerHTML = "Value: " + slider.value;
@@ -171,10 +176,14 @@ function createField() {
 
 		let index = contains(animations, "id", animationContainer.name)
 
-		if(index == -1)
+		if(index == -1) {
 			animations.push(animateVariable(animationContainer))
-		else
+			animationToggle.innerHTML = '<i class="far fa-pause-circle"></i>'
+		}
+		else {
 			animations.splice(index, 1)
+			animationToggle.innerHTML = '<i class="far fa-play-circle"></i>'
+		}
 
 		animate()
 	}
@@ -291,7 +300,7 @@ function createField() {
   			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
   			this.nextSibling.children[1].style.display = "none"
   			this.nextSibling.children[2].children[0].value = object.value
-  			this.nextSibling.children[2].children[0].id = "1_" + object.name
+  			// this.nextSibling.children[2].children[0].id = "1_" + object.name
   			this.nextSibling.children[3].name = object.name
   			this.nextSibling.children[2].style.display = "block"
   			this.nextSibling.children[3].style.display = "block"
