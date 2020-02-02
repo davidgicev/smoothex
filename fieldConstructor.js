@@ -47,7 +47,7 @@ function createField() {
 
 			let index = contains(functions, "name", value)
 			functions[index].color = pickedColor
-			color.style.borderColor = pickedColor
+			input.style.borderLeft = "10px solid " + pickedColor
 
 			draw()
 		}
@@ -229,6 +229,7 @@ function createField() {
 		}
 
 		zapamti = this
+		zapamti.focus()
 
   	event.preventDefault()
 
@@ -252,11 +253,14 @@ function createField() {
   	let results = processInputs(novi)
 
   	for(let i=0; i<results.length; i++) {
-  		if(results[i] === 1)
-  			children[i].children[0].style.backgroundColor = "rgba(255,255,255,0.7)"
+  		if(results[i] === 1) {
+  			children[i].children[0].style.backgroundColor = "transparent"
+  			if(!novi[i])
+  				children[i].children[0].style.borderLeft = "10px solid rgba(0,0,0,0.07)"
+  		}
   		else if (results[i]) {
   			this.value = results[i] + "(x) = " + this.value
-  			children[i].children[0].style.backgroundColor = "rgba(255,255,255,0.7)"
+  			children[i].children[0].style.backgroundColor = "transparent"
   		}
   		else
   			children[i].children[0].style.backgroundColor = "rgba(240,20,60,0.4)"
@@ -285,19 +289,23 @@ function createField() {
 
 		if(object.f) {
 
-			this.nextSibling.children[0].innerHTML = "Parsed: " + object.readable
+			this.nextSibling.children[0].innerHTML =  object.readable
 
 			//console.log(functions)
 
 			let index = contains(functions, "name", object.name)
 
-			this.nextSibling.children[1].style.borderColor = functions[index].color
+			// this.nextSibling.children[1].style.borderColor = functions[index].color
+			input.style.borderLeft = "10px solid " + functions[index].color
+			// input.style.boxShadow = "0px -7px 3px -5px inset " + functions[index].color
 			this.nextSibling.children[1].style.display = "block"
   			this.nextSibling.children[2].style.display = "none"
   			this.nextSibling.children[3].style.display = "none"
 		}
 		else {
-  			this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+  			// this.nextSibling.children[0].innerHTML = "Value:  "+object.value
+  			input.style.borderLeft = "10px solid rgba(0,0,0,0.07)"
+  			this.nextSibling.children[0].style.display = "none"
   			this.nextSibling.children[1].style.display = "none"
   			this.nextSibling.children[2].children[0].value = object.value
   			// this.nextSibling.children[2].children[0].id = "1_" + object.name
@@ -318,7 +326,7 @@ function createField() {
 
 	  			// start(drawFunctionInit(object))
   				// this.nextSibling.children[1].style.display = "block"
-
+  				// text.style.display = "none"
 	container.appendChild(text)
 	color.appendChild(colorText)
 	color.appendChild(colorButton)

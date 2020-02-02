@@ -17,9 +17,9 @@ function roundToNumber(toRound, number) {
 	return toRound - (toRound%number)
 }
 
-function nearestTen(number) {
+function nearestToBase(number, base) {
 	number = Math.abs(number)
-	return Math.pow(2, Math.floor( Math.log(number)/Math.log(2) ));
+	return Math.pow(base, Math.floor( Math.log(number)/Math.log(base) ));
 }
 
 function getFreeName() {
@@ -190,4 +190,25 @@ function stopAnimation(animationContainer) {
 
 	// animations.push(animateVariable(container))
 
+}
+
+function formatNumber(a, nIncrement) {
+
+	a = Number(a)
+
+	if(a == 0)
+		return 0
+
+	if(nIncrement < 0.01)
+		a = a.toExponential(3)
+	else if(nIncrement > 100)
+		a = a.toExponential(0)
+
+	a = String(a)
+
+	if(a.indexOf('e') != -1) {
+		a = a.replace("e", "*10^")
+	}
+
+	return a
 }

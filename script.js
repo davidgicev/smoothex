@@ -35,7 +35,7 @@ var light = {
 	background: "white",
 	axes: "black",
 	font: "gray",
-	colors: ["transparent","#8CDEDC", "#2191FB", "#de214e", "indigo", "green"]
+	colors: ["transparent", "#2191FB","orange", "#de214e", "indigo", "green"]
 }
 
 var dark = {
@@ -131,6 +131,8 @@ document.getElementById("screen").addEventListener("mousemove", (event) => {
 	if(isMouseDown) {
 		pan()
 	}
+	if(zoom > 2)
+		requestAnimationFrame(previewPoints)
 })
 
 document.getElementById("screen").addEventListener("mousedown", (event) => {
@@ -149,11 +151,11 @@ document.getElementById("screen").addEventListener("wheel", (event) => {
 	let dodadenZoom = -0.05*Math.sign(event.deltaY)
 	zoom += zoom*dodadenZoom
 	// console.log(zoom)
+	scale += scale*dodadenZoom
 
 	xInterval += mouseX/scale*dodadenZoom
 	yInterval += mouseY/scale*dodadenZoom
 
-	scale += scale*dodadenZoom
 
 
 	draw()

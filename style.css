@@ -1,5 +1,5 @@
 body {
-	font-family: Georgia;
+	font-family: Times New Roman;
 	margin: 0px;
 }
 
@@ -13,7 +13,7 @@ body {
 	position: absolute;
 	top:0px;
 	left:0px;
-	background-color: rgba(255,255,255,0.9);
+	background-color: rgba(255,255,255,0.95);
 	overflow-y: hidden;
 }
 
@@ -41,27 +41,36 @@ body {
 	outline: none;
 	padding: 10px;
 	border: none;
-	border-bottom: 1px solid black;
+	/*border-bottom: 1px solid black;*/
+	/*box-shadow: 0px 10px 5px -12px rgba(0,0,0,0.5);*/
+	border-left: 10px solid rgba(0,0,0,0.07);
+	border-bottom: 1px solid lightgray;
 	background-color: transparent;
 	font-size: 20px;
-	font-family: Georgia;
+	font-family: Times New Roman;
 	color: black;
+	width: 220px;
 }
 
 .fieldText {
 	margin-top: 15px;
 	font-size: 19px;
 	padding: 5px;
+	padding-left: 10px;
+	width: 230px;
+	border: 5px solid rgba(0,0,0,0.07);
+	border-radius: 5px;
+	display: none;
 }
 
 .fieldColor {
-	margin-top: 10px;
-	border: 5px solid;
-	border-radius: 10px;
+	margin-top: 15px;
+	border: 5px solid rgba(0,0,0,0.07);
+	border-radius: 5px;
 	padding: 5px;
 	display: block;
-	width: 230px;
-	transition: border 0.5s;
+	width: 235px;
+	/*transition: border 0.5s;*/
 }
 
 .fieldColorButton {
@@ -82,7 +91,7 @@ body {
 
 .animationContainer {
 	margin-top: 10px;
-	border: 5px solid lightgray;
+	border: 5px solid rgba(0,0,0,0.07);
 	border-radius: 10px;
 	padding: 10px;
 	display: block;
@@ -128,15 +137,16 @@ body {
 .slider {
   -webkit-appearance: none;
   width: 250px;
-  height: 10px;
-  border-radius: 5px;  
-  background: #d3d3d3;
+  height: 11px;
+  border-radius: 4px;  
+  background: rgba(0,0,0,0.07);
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 12px;
 }
 
 .slider::-webkit-slider-thumb {

@@ -2,13 +2,13 @@ function draw() {
 	drawAxes()
 	drawGrid()
 	drawFunctions()
-	variables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
-	builtInVariables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
+	// variables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
+	// builtInVariables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
 }
 
 function drawFunctions() {
 
-	for (let i=7; i<functions.length; i++) {
+	for (let i=builtInFunctions.length; i<functions.length; i++) {
 		drawFunction(functions[i])
 	}
 }
@@ -38,7 +38,7 @@ function drawAxes() {
 
 	nIncrement /= 5;
 
-	nIncrement = nearestTen(nIncrement)
+	nIncrement = nearestToBase(nIncrement,2)
 
 	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
@@ -59,7 +59,7 @@ function drawAxes() {
 		if(i == 0)
 			renderX -= 10
 
-		ctx.fillText(i, renderX, -yInterval*scale + 20);
+		ctx.fillText(formatNumber(i, nIncrement), renderX, -yInterval*scale + 20);
 
 	}
 
@@ -82,7 +82,7 @@ function drawAxes() {
 		if(i == 0)
 			continue
 
-		ctx.fillText(-i, -xInterval*scale + String(i).length*5+10, renderY + 4);
+		ctx.fillText(formatNumber(-i, nIncrement), -xInterval*scale + String(i).length*5+10, renderY + 4);
 
 	}
 }
@@ -102,7 +102,7 @@ function drawGrid() {
 
 	nIncrement /= 20;
 
-	nIncrement = nearestTen(nIncrement)
+	nIncrement = nearestToBase(nIncrement, 2)
 
 	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
@@ -157,6 +157,9 @@ function drawFunction(f) {
 
 	let ctx = canvas.getContext("2d")
 
+	ctx.beginPath()
+
+
 	for(let i=xInterval; i<screenWidth/scale + xInterval;) {
 
 	ctx.strokeStyle = color
@@ -191,7 +194,9 @@ function drawFunction(f) {
 
 	nIncrement = promena
 
-		
+	
+	if(scale < 1)
+		nIncrement = 1/scale	
 
 	if(starn > nIncrement) {
 
@@ -218,6 +223,8 @@ function drawFunction(f) {
 	if(Math.abs(momentalenIzvod) > windowHeight) {
 		//asimptota
 
+		ctx.stroke()
+
 		ctx.beginPath()
 		ctx.moveTo(renderX , renderY)
 		ctx.lineTo(renderX, Math.sign(y)*(windowHeight))
@@ -228,20 +235,24 @@ function drawFunction(f) {
 		ctx.lineTo(renderX, Math.sign(y2)*(windowHeight))
 		ctx.stroke()
 
+		// ctx.beginPath()
+
+
 		continue
 	}
 
 
-	ctx.beginPath()
+	// ctx.beginPath()
 	ctx.moveTo(renderX , renderY)
 	ctx.lineTo(renderX2, renderY2)
-	ctx.stroke()
+	// ctx.stroke()
 
 	}
 
 	//elapsedTime += (new Date()).getTime() - vreme
 	//console.log(elapsedTime)
 	//elapsedTime = 0
+	ctx.stroke()
 
 }
 
@@ -432,4 +443,50 @@ function drawTangent() {
 	})
 
 	animateXInterval()
+}
+
+
+
+function previewPoints() {
+
+	draw()
+
+	let ctx = canvas.getContext("2d")
+
+	x = mouseX/scale + xInterval
+	y = mouseY/scale + yInterval
+
+	let counter = 0
+
+	for(let i=builtInFunctions.length; i<functions.length; i++) {
+
+		if(Math.abs( functions[i].f(x) + y ) < 0.25/zoom) {
+
+			
+			ctx.fillStyle = functions[i].color
+			ctx.beginPath()
+			ctx.arc((x-xInterval)*scale, (-functions[i].f(x)-yInterval)*scale, 5, 0, 2*3.1415)
+			ctx.fill()
+
+			ctx.fillStyle = functions[i].color
+
+			ctx.beginPath()
+
+			ctx.rect(mouseX+8, mouseY-48 - counter*40, 144, 39)
+			ctx.fill()
+
+			ctx.fillStyle = "white"
+
+			ctx.beginPath()
+
+			ctx.rect(mouseX+10, mouseY-46 - counter*40, 140, 35)
+			ctx.fill()
+
+			ctx.fillStyle = "black"
+			
+			ctx.fillText("("+x.toFixed(5)+ ","+functions[i].f(x).toFixed(5)+")", mouseX + 10 + 70, mouseY -25 -counter*40)
+
+			counter++
+		}
+	}
 }
