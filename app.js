@@ -2,7 +2,7 @@ import {draw} from './draw.js';
 import {animations, animate} from './animationClass.js'
 import {animateSetup} from './setupAnimation.js'
 
-var animateSetupBool = false
+var animateSetupBool = true
 
 var config = {
 	width:  window.innerWidth,
