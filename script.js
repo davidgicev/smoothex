@@ -1,181 +1,169 @@
-var windowWidth  = window.innerWidth;
-var windowHeight = window.innerHeight;
+import {state, config} from './app.js';
+import {draw} from './draw.js';
+import {createFieldInstance} from './FieldManager.js'
+import {blurFields} from './FieldManager.js'
+import {toggleOptionsButton, toggleTheme} from './toggles.js'
+import {themes} from './themes.js'
+import {initializeCache} from './drawHandler.js'
 
 var canvas = document.getElementById("screen");
 
-canvas.width  = windowWidth
-canvas.height = windowHeight
+canvas.width  = config.width
+canvas.height = config.height
 
-var xAxis = windowHeight/2
-var screenWidth = windowWidth
-var commandContainerRatio = 0.2
-var scale = Math.max(windowWidth, windowHeight)/13
-var xInterval = -windowWidth/scale/2 - windowWidth*commandContainerRatio/scale/2
-var yInterval = -windowHeight/scale/2
-var nIncrement = 0.01
+var svg = document.getElementById("svgScreen")
 
-var mouseX = windowWidth/2 + windowWidth*commandContainerRatio/2;
-var mouseY = windowHeight/2;
+svg.style.width  = config.width + "px"
+svg.style.height = config.height + "px"
 
-var lastMouseX = 0;
-var lastMouseY = 0;
+document.getElementById("leftPanel").style.height = config.height + "px"
+document.getElementById("leftPanel").style.width  = config.animateSetup ? 0 : config.width*config.commandContainerRatio + "px"
 
-var elapsedTime = 0
-
-var animations = []
-var transitions = []
-
-var fps = 60;
-var INTERVAL = Math.ceil(1000/fps);
-var currentTime = 0, lastTime = (new Date()).getTime(), delta = 0;
-var isMouseDown;
-var zoom = 1;
-
-var light = {
-	background: "white",
-	axes: "black",
-	font: "gray",
-	colors: ["transparent", "#2191FB","orange", "#de214e", "indigo", "green"]
+if(config.animateSetup) {
+	document.getElementById("leftPanel").style.overflow = 'hidden'
+}
+else {
+	document.getElementById("optionsButton").style.transform = "scale(1)"	
 }
 
-var dark = {
-	background: "black",
-	axes: "white",
-	font: "white"
-}
+document.addEventListener("keydown", (e) => {
+	if(e.keyCode === 16)
+		state.shift = true
+})
+document.addEventListener("keyup", (e) => {
+	if(e.keyCode === 16)
+		state.shift = false
+})
 
-var theme = light;
+let themeName = localStorage.getItem("theme")
+
+if(themeName)
+	config.theme = themes[themeName]
+else
+	config.theme = themes.light
+
+document.getElementById("themeFile").href = config.theme.name + ".css"
+
+canvas.style.backgroundColor = config.theme.background
 
 
-var POCHETEN = scale
+document.getElementById("optionsButton").addEventListener("mousedown", toggleOptionsButton)
+document.getElementById("themeToggle")  .addEventListener("mousedown", toggleTheme)
+document.getElementById("animationKoef").addEventListener("mousedown", animationKoef)
 
-var builtInFunctions = [{
-		name: "sin",
-		f: Math.sin
-	},
-	{
-		name: "cos",
-		f: Math.cos
-	},
-	{
-		name: "tan",
-		f: Math.tan
-	},
-	{
-		name: "cotan",
-		f: x => 1/Math.tan(x)
-	},
-	{
-		name: "abs",
-		f: Math.abs
-	},
-	{
-		name: "sqrt",
-		f: Math.sqrt
-	},
-	{
-		name: "ln",
-		f: Math.log
+document.addEventListener("mousemove", (event) => {
+
+	state.mouseX = event.clientX
+	state.mouseY = event.clientY
+
+	if(!state.resizingMode) {
+		if(Math.abs(state.mouseX/config.width - config.commandContainerRatio) < 0.005)
+			document.body.style.cursor = "ew-resize"
+		else
+			document.body.style.cursor = "default"
 	}
-]
-
-var functions = [...builtInFunctions]
-
-var builtInVariables = [{
-		name: "x",
-		value: null
-	}, 
-	{
-		name: "centerX",
-		value: null
-	},
-	{
-		name: "pi",
-		value: Math.PI
-	},
-	{
-		name: "e",
-		value: Math.E
+	
+	if(state.isMouseDown) {
+		
+		if(state.resizingMode) {
+			config.commandContainerRatio = state.mouseX/config.width
+			document.getElementById("leftPanel").style.width  = config.width*config.commandContainerRatio + "px"
+		}
+		else
+			pan()
 	}
-]
-
-var variables = [... builtInVariables]
-
-var zapamti;
-
-document.getElementById("window").style.width  = windowWidth  + "px"
-document.getElementById("window").style.height = windowHeight + "px"
-
-document.getElementById("commandContainer").style.width  = Math.max(windowWidth*commandContainerRatio, 300) + "px"
-document.getElementById("commandContainer").style.height = windowHeight     + "px"
-
-initCommands()
-draw()
-
-function initCommands() {
-
-	let container = document.getElementById("commandContainer")
-
-	createField()
-	createField()
-	createField()
-
-	container.children[0].children[0].focus()
-}
-
-
-
-document.getElementById("screen").addEventListener("mousemove", (event) => {
-	mouseX = event.clientX
-	mouseY = event.clientY
-	if(isMouseDown) {
-		pan()
-	}
-	if(zoom > 2)
-		requestAnimationFrame(previewPoints)
 })
 
 document.getElementById("screen").addEventListener("mousedown", (event) => {
-	lastMouseX = mouseX
-	lastMouseY = mouseY
-	isMouseDown = true
-	hideInfo()
+	state.lastMouseX = state.mouseX
+	state.lastMouseY = state.mouseY
+	state.isMouseDown = true
+	blurFields()
 })
 
-document.getElementById("screen").addEventListener("mouseup", (event) => {
-	isMouseDown = false
+document.addEventListener("mousedown", (event) => {
+
+	if(Math.abs(state.mouseX/config.width - config.commandContainerRatio) < 0.01) {
+		state.resizingMode = true;
+		state.isMouseDown = true;
+		document.body.style.cursor = "ew-resize"
+	}
+
+	if(state.mouseX/config.width > config.commandContainerRatio)
+		state.isMouseDown = true;
+})
+
+document.addEventListener("mouseup", (event) => {
+
+	state.isMouseDown = false
+
+	config.globalDebbuging = true
+
+	if(state.resizingMode) {
+		config.commandContainerRatio = state.mouseX/config.width
+		document.getElementById("leftPanel").style.width  = config.width*config.commandContainerRatio + "px"
+	}
+
+	state.resizingMode = false
+	document.body.style.cursor = "default"
 })
 
 document.getElementById("screen").addEventListener("wheel", (event) => {
 
-	let dodadenZoom = -0.05*Math.sign(event.deltaY)
-	zoom += zoom*dodadenZoom
-	// console.log(zoom)
-	scale += scale*dodadenZoom
+	let dodadenZoom = -0.09*Math.sign(event.deltaY)
+	state.zoom += state.zoom*dodadenZoom
+	state.scale += state.scale*dodadenZoom
 
-	xInterval += mouseX/scale*dodadenZoom
-	yInterval += mouseY/scale*dodadenZoom
-
-
+	state.xInterval += state.mouseX/state.scale*dodadenZoom
+	state.yInterval += state.mouseY/state.scale*dodadenZoom
 
 	draw()
 })	
 
 window.addEventListener("resize", () => {
 
-	windowWidth  = window.innerWidth;
-	windowHeight = window.innerHeight;
-	screenWidth = windowWidth
+	config.width  = window.innerWidth;
+	config.height = window.innerHeight;
 
-	canvas.width  = windowWidth
-	canvas.height = windowHeight
+	canvas.width  = config.width
+	canvas.height = config.height
+
+	svg.style.width  = config.width + "px"
+	svg.style.height = config.height + "px"
 
 	//scale = Math.max(windowWidth, windowHeight)/13
 
-	document.getElementById("window").style.width  = windowWidth  + "px"
-	document.getElementById("window").style.height = windowHeight + "px"
+	document.getElementById("window").style.width  = config.width  + "px"
+	document.getElementById("window").style.height = config.height + "px"
 
-	document.getElementById("commandContainer").style.width  = Math.max(windowWidth*commandContainerRatio, 300) + "px"
-	document.getElementById("commandContainer").style.height = windowHeight     + "px"
+	// document.getElementById("leftPanel").style.width  = Math.max(windowWidth*Application.config.commandContainerRatio, 300) + "px"
+	document.getElementById("leftPanel").style.height = config.height + "px"
 	draw()
 });
+
+var pan = function() {
+
+	state.xInterval -= (state.mouseX - state.lastMouseX)/state.scale
+	state.yInterval -= (state.mouseY - state.lastMouseY)/state.scale
+
+
+	let ctx = document.getElementById("screen").getContext('2d');
+	ctx.clearRect(0,0,config.width,config.height)
+
+
+	// panTest()
+	// workerPan()
+
+	state.lastMouseX = state.mouseX
+	state.lastMouseY = state.mouseY
+	
+	draw()
+}
+
+
+createFieldInstance()
+createFieldInstance()
+createFieldInstance()
+
+initializeCache()
+draw()

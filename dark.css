@@ -1,0 +1,140 @@
+.field {
+	border-left: 10px solid #333333;
+	background-color: black;
+}
+
+#commandScreen {
+	background-color: #191919;
+	color: white;
+}
+
+#optionsScreen {
+	background-color: #232323;
+	color: white;
+}
+
+#optionsButton {
+	background-color: #333333;
+	color: black;
+}
+
+#optionsButton.pressed {
+	background-color: #555;
+	color: black;
+}
+
+.osEntry {
+	background-color: black;
+}
+
+.field {
+	color: white;
+}
+
+.fieldSubContainer {
+	border-top: 1px solid #383838;
+}
+
+.fieldColorButton {
+	color: lightgrey;
+}
+
+.transparentOutline {
+	box-shadow: 0px 0px 0px 1px rgba(255,255,255,0.3) inset;
+}
+
+.animationContainer {
+	border-top: 1px solid #383838;
+}
+
+.animationButton {
+	color: lightgrey;
+}
+
+.animationEditButton {
+	color: lightgrey;
+}
+
+.animationEditContainer div input[type=text] {
+	border-bottom: 1px solid #383838;
+}
+
+.slider {
+  	background-color: #434343;
+}
+
+.slider::-webkit-slider-thumb {
+  background: white;
+}
+
+.slider::-moz-range-thumb {
+  background: white;
+}
+
+.fieldErrorContainer {
+	background-color: #6c1323;
+	color: white;
+}
+
+.fieldErrorArrow {
+	border-right: 10px solid #6c1323;
+}
+
+.ftRootContent > div {
+	border-top: 0.5px solid white;
+}
+
+.ftRootSVGWrapper > svg {
+	fill: white;
+}
+
+.ParenthesesElement > div:nth-child(1), .ParenthesesElement > div:nth-child(3) {
+    fill: white;
+}
+
+.ParenthesesLeftClosedElement > div:nth-child(3) {
+    fill: gray;
+}
+
+.ParenthesesRightClosedElement > div:nth-child(1) {
+    fill: gray;
+}
+
+.AbsClosedElement {
+    border-left: 10px solid white;
+    border-right: 10px solid white;
+}
+
+.AbsLeftClosedElement {
+    border-left: 10px solid white;
+}
+
+.AbsRightClosedElement {
+    border-right: 10px solid white;
+}
+
+.FractionElement > div:nth-child(1) {
+    border-bottom: 0.1px solid white;
+}
+
+.FractionElement > div:nth-child(2) {
+    border-top: 0.1px solid white;
+}
+
+.AutoCompleteWrapper {
+    background-color: #333;
+    color: white;
+}
+
+.AutoCompleteSelected {
+    background-color: #555;
+    color: white;
+}
+
+.Cursor:after {
+    background: lightgrey;
+}
+
+.EmptyWarning {
+    background-color: #333;
+}

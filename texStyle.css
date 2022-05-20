@@ -1,0 +1,176 @@
+.ftContainer {
+	white-space: nowrap;
+	min-height: 45px;
+	overflow-x: hidden;
+	font-size: 40;
+	padding-left: 10px;
+	/*border-left: 10px solid #ededed;*/
+	display: flex;
+	align-items: center;
+}
+
+
+.ftFraction {
+	/*min-height: 0px;*/
+	/*position: relative;*/
+	/*background-color: blue;*/
+	/*box-shadow: inset 0px 0px 0px 2px gray;*/
+	display: inline-block;
+	/*grid-auto-rows: 1fr;*/
+	/*grid-auto-flow: row;*/
+	/*vertical-align: middle;*/
+	/*align-items: flex-start;*/
+	/*justify-content: center;*/
+	padding-right: 2px;
+	padding-left: 2px;
+	font-size: 0.9em;
+	vertical-align: -0.6em;
+	text-align: center;
+}
+
+.Imenitel {
+	float: right;
+	width: 100%;
+}
+
+.ftFraction > div {
+	display: block;
+	/*vertical-align: bottom;*/
+	/*padding: 0px;*/
+	/*box-shadow: inset 0px 0px 0px 1px gray;*/
+	font-size: inherit;
+	text-align: center;
+	/*align-items: flex-end;*/
+	/*align-self: flex-end;*/
+	/*min-width: 10px;*/
+}
+/*
+.ftFraction span {
+	display: inline;
+	font-size: inherit;
+	/*box-shadow: inset 0px 0px 0px 1px gray;*/
+}
+*/
+
+.ftWrapper {
+	/*position: relative;*/
+	/*background-color: blue;*/
+	display: inline-block;
+	/*background-color: rgba(255,0,0,0.5);*/
+	/*align-items: center;*/
+	vertical-align: middle;
+	/*align-self: center;*/
+	/*box-shadow: inset 0px 0px 0px 1px gray;*/
+	white-space: pre;
+	font-size: inherit;
+	font-size: 0.8em;
+	vertical-align: 0.5em;
+	/*bottom: 0px;*/
+	/*transition: bottom 1s, font-size 0.5s, padding 1s;*/
+}
+
+.ftOuter {
+	/*background-color: blue;*/
+	display: inline-block;
+	/*background-color: rgba(255,0,0,0.5);*/
+	/*align-items: center;*/
+	vertical-align: middle;
+	/*align-self: center;*/
+	/*box-shadow: inset 0px 0px 0px 1px gray;*/
+	white-space: pre;
+	/*bottom: 0px;*/
+	/*transition: bottom 1s, font-size 0.5s, padding 1s;*/	
+}
+
+.ftExponent {
+	/*position: relative;*/
+	/*background-color: blue;*/
+	display: inline-block;
+	/*background-color: rgba(255,0,0,0.5);*/
+	/*align-items: center;*/
+	/*vertical-align: middle;*/
+	/*align-self: center;*/
+	/*box-shadow: inset 0px 0px 0px 1px gray;*/
+	white-space: pre;
+	font-size: inherit;
+	font-size: 0.7em;
+	vertical-align: 0.7em;
+	/*bottom: 0px;*/
+	/*transition: bottom 1s, font-size 0.5s, padding 1s;*/
+}
+
+.ftSub {
+	display: inline-block;
+	white-space: pre;
+	font-size: 0.7em;
+	vertical-align: -0.6em;
+	margin-right: 0.1em;
+
+}
+
+.ftInnerShell {
+	display: inline-block;
+	vertical-align: bottom;
+}
+
+.ftText {
+	/*background-color: rgba(0,0,255,0.1);*/
+	display: inline-block;
+	white-space: pre;
+	outline: none;
+	min-width: 0.35em;
+	background-color: rgba(0,0,0,0.08)
+}
+
+.ftRoot {
+	display: inline-block;
+	margin-left: 0.2em;
+	margin-top: 0.1em;
+}
+
+.ftRootPok {
+	display: inline-block;
+	vertical-align: 1.15em;
+	margin-right: -0.6em;
+	min-width: 0.5em;
+	font-size: 0.6em;
+	z-index: 1;
+}
+
+.ftRootContent {
+	display: inline-block;
+	position: relative;
+}
+
+.ftRootContent > div {
+	display: inline-block;
+	margin-left: 0.6em;
+}
+
+.ftRootSVGWrapper {
+	position: absolute;
+	top: 0px;
+	bottom: 0.20em;
+	left: 1px;
+}
+
+.ftRootSVGWrapper > svg {
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 0.6em;
+}
+
+/*.ftText:empty:not:before; {
+	background-color: rgba(0,0,0,0.04);
+}
+
+[contentEditable=true]:empty:not(:focus):before {
+  background-color: rgba(0,0,0,0.08);
+}
+*/
+/*[contentEditable=true]:empty:before {
+	content:"  ";
+}*/

@@ -1,31 +1,27 @@
+import {Field} from './Field.js'
 import {state, config} from './app.js';
-import {draw} from './draw.js';
-import {findField, checkAddField, blurFields} from './FieldManager.js';
-import {createInputField, moveCaretToEnd} from './fensitex.js';
-import {runInterpreter} from './interpreter.js';
-import {FensiInput} from './fensitex/index.js'
+import {draw} from './draw.js'
 
-var createField = function() {
 
-	let id = Math.round(Math.random()*1000)
+Field.prototype.generateHtml = function() {
 
 	let element = document.createElement("div")
 	element.className = "field"
 	element.id = -1
+	this.html.field = element
 
-	let input = new FensiInput()
-
-	let errorContainer = document.createElement("div")
-	errorContainer.className = "fieldErrorContainer"
+	let input = this.input.render()
 
 	let container = document.createElement("div")
 	container.className = "fieldSubContainer"
+	this.html.subcontainer = container
 
 	let text = document.createElement("div")
 	text.className = "fieldText"
 
 	let color = document.createElement("div")
 	color.className = "fieldColor"
+	this.html.colorContainer = color
 
 	let colorEntry = document.createElement("div")
 	colorEntry.className = "fieldColorEntry"
@@ -49,14 +45,13 @@ var createField = function() {
 
 		colorOption.style.backgroundColor = config.theme.colors[i]
 
+		if(i == 0)
+			colorOption.classList.add("transparentOutline")
+
 		colorOption.onclick = () => {
 
 			let pickedColor = config.theme.colors[i]
-
-			let field = findField(id)
-
-			field.updateFuncColor(pickedColor);
-
+			this.updateFuncColor(pickedColor);
 			draw()
 		}
 
@@ -70,6 +65,7 @@ var createField = function() {
 	slider.max = 5
 	slider.value = 0
 	slider.step = 0.01
+	this.html.sliderContainer = sliderContainer
 
 	let sliderEditMin = document.createElement("span")
 	sliderEditMin.contentEditable = "true"
@@ -85,8 +81,7 @@ var createField = function() {
 		event.preventDefault()
 		slider.min = Number(sliderEditMin.textContent)
 		slider.value = Math.max(sliderEditMin.textContent, slider.value)
-		let field = findField(id);
-		field.value = Number(slider.value);
+		this.value = Number(slider.value);
 		draw()
 	})
 
@@ -96,8 +91,7 @@ var createField = function() {
 		event.preventDefault()
 		slider.max = Number(sliderEditMax.textContent)
 		slider.value = Math.min(sliderEditMax.textContent, slider.value)
-		let field = findField(id);
-		field.value = Number(slider.value);
+		this.value = Number(slider.value);
 		draw()
 	})
 
@@ -110,6 +104,10 @@ var createField = function() {
 
 	let animationContainer = document.createElement("div")
 	animationContainer.className = "animationContainer"
+	this.html.animationContainer = animationContainer
+
+	let animationHeader = document.createElement('div')
+	animationHeader.className = 'animationHeader'
 
 	let animationText = document.createElement("div")
 	animationText.className = "animationText"
@@ -154,9 +152,7 @@ var createField = function() {
 	// animationInputSpeed.step = 1
 	animationInputSpeed.value= 5
 	animationInputSpeed.oninput = () => {
-
-		let field = findField(id)
-		field.changeAnimationSpeed(animationInputSpeed.value)
+		this.changeAnimationSpeed(animationInputSpeed.value)
 	}
 	animationInputSpeed.className = "slider"
 	animationEditSpeed.className  = "sliderContainer"
@@ -166,67 +162,39 @@ var createField = function() {
 	animationEditContainer.appendChild(animationEditSpeed)
 
 	slider.oninput = () => {
-		let field = findField(id)
-		field.value = Number(slider.value);
-		field.toggleAnimation(true)
+		this.value = Number(slider.value);
+		this.toggleAnimation(true)
 		draw()
 	}
 
 	animationToggle.onclick = () => {
-
-		let field = findField(id)
-		
-		field.toggleAnimation();
-		
-
+		this.toggleAnimation();
 	}
 
-	colorButton.onclick = () => {
+	// colorButton.onclick = () => {
 
-		let status = colorPalette.style.display
+	// 	let status = colorPalette.style.display
 
-		if(status == "block")
-			colorPalette.style.display = "none";
-		else
-			colorPalette.style.display = "block";
-	}
+	// 	if(status == "block")
+	// 		colorPalette.style.display = "none";
+	// 	else
+	// 		colorPalette.style.display = "block";
+	// }
 
 	container.appendChild(text)
-	colorEntry.appendChild(colorText)
 	colorEntry.appendChild(colorButton)
+	colorEntry.appendChild(colorText)
 	color.appendChild(colorEntry)
 	color.appendChild(colorPalette)
 	container.appendChild(color)
 	container.appendChild(sliderContainer)
-	animationContainer.appendChild(animationText)
-	animationContainer.appendChild(animationToggle)
-	animationContainer.appendChild(animationEditButton)
+	animationHeader.appendChild(animationText)
+	animationHeader.appendChild(animationToggle)
+	animationHeader.appendChild(animationEditButton)
+	animationContainer.appendChild(animationHeader)
 	animationContainer.appendChild(animationEditContainer)
 	container.appendChild(animationContainer)
 	element.appendChild(input)
 	element.appendChild(container)
-	element.appendChild(errorContainer)
 	document.getElementById("commandContainer").appendChild(element)
-	return {
-		id: id,
-		element: element
-	}
 }
-
-function expandField(reference) {
-
-	let object  = reference.object
-	let element = reference.element.firstElementChild
-
-	if(!object.name)
-		return;
-
-	if(object.f && object.f.length != 1)
-		return
-
-	element.nextSibling.nextSibling.style.display = "none"
-	element.nextSibling.style.display = "flex"
-
-}
-
-export {createField}
