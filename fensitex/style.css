@@ -1,0 +1,329 @@
+#root {
+    display: flex;
+    align-items: center;
+    width: 500px;
+    height: 100px;
+    background-color: whitesmoke;
+    padding: 20px;
+    /*overflow-x: hidden;*/
+}
+
+.rendered {
+    display: inline-flex;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    padding-left: 0.4em;
+    transition: padding 0.5s;
+    overflow-x: auto;
+}
+
+.rendered::-webkit-scrollbar {
+    width: 0.1em;
+}
+
+.AssignmentElement {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.AssignmentElement > div {
+    display: inline-block;
+}
+
+.VirtElement {
+    display: inline-block;
+    /*background-color: rgba(0,0,255,0.2);*/
+    white-space: nowrap;
+}
+
+
+.NDC {
+    display: inline-block;
+    /*background-color: rgba(0,0,255,0.1);*/
+}
+
+.VariableElement {
+    display: inline-block;
+    /*background-color: rbga(255,140,0,0.1);*/
+}
+
+.ParenthesesElement {
+    display: inline-block;
+    position: relative;
+}
+
+.ParenthesesCWElement {
+    display: inline-block;
+    /*margin: 0.15em;*/
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+}
+
+.ParenthesesWLElement {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 0;
+}
+
+.ParenthesesWLElement > svg {
+    height: 100%;
+    width: 0.3em;
+}
+
+.ParenthesesWRElement {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+
+.ParenthesesWRElement > svg {
+    height: 100%;
+    width: 0.3em;
+}
+
+.ParenthesesLeftClosedElement > div:nth-child(3) {
+    fill: gray;
+}
+
+.ParenthesesRightClosedElement > div:nth-child(1) {
+    fill: gray;
+}
+
+
+.AbsElement {
+    display: inline-block;
+    border-left: 6px solid gray;
+    border-right: 6px solid gray;
+}
+
+.AbsWLElement {
+    display: inline-block;
+}
+
+.AbsClosedElement {
+    border-left: 10px solid black;
+    border-right: 10px solid black;
+}
+
+.AbsLeftClosedElement {
+    border-left: 10px solid black;
+}
+
+.AbsRightClosedElement {
+    border-right: 10px solid black;
+}
+
+.SubscriptElement {
+    /*background-color: rgba(0,255,255,0.3);*/
+    display: inline-block;
+    font-size: 0.8em;
+    vertical-align: -0.5em;
+}
+
+.ND,
+.NumberElement,
+.SeparatorElement,
+.FunctionElement {
+    display: inline-block;
+    /*background-color: rgba(0,128,0,0.1);*/
+    white-space: pre;
+    text-align: center;
+    padding-left: 0.05em;
+    padding-right: 0.05em;
+    /*padding-bottom: 0.1em;*/
+    /*padding-top: 0.1em;*/
+}
+
+.OperatorElement {
+    display: inline-block;
+    /*background-color: rgba(0,128,0,0.1);*/
+    white-space: pre;
+    text-align: center;
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+}
+
+.EqualsSign {
+    display: inline-block;
+    /*background-color: rgba(0,128,0,0.1);*/
+    white-space: pre;
+    text-align: center;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
+.SeparatorElement {
+    /*background-color: rgba(255,255,255,0.5);*/
+}
+
+.ExponentElement {
+    display: inline-block;
+    /*background-color: rgba(139,0,0,0.3);*/
+}
+
+.ExponentExpoElement {
+    display: inline-block;
+    font-size: 0.8em;
+    vertical-align: super;
+}
+
+.ExponentExpoElement > .VirtElement {
+    vertical-align: bottom;
+    margin-bottom: 0.25em;
+}
+
+.FractionElement {
+    display: inline-block;
+    /*background-color: rgba(147,112,219,0.3);*/
+    vertical-align: -0.6em;
+}
+
+.FractionElement > div {
+    text-align: center;
+    width: 100%;
+}
+
+.FractionElement > span {
+    visibility: hidden;
+    display: inline-block;
+}
+
+.FractionElement > div:nth-child(1) {
+    border-bottom: 0.1px solid black;
+    padding-bottom: 2px;
+    display: block;
+}
+
+.FractionElement > div:nth-child(2) {
+    border-top: 0.1px solid black;
+    padding-top: 2px;
+    float: right;
+    display: block;
+}
+
+
+.RootElement {
+    display: inline-block;
+}
+
+.RootIndexElement {
+    display: inline-block;
+    vertical-align: 1.15em;
+    margin-right: -0.6em;
+    min-width: 0.5em;
+    font-size: 0.6em;
+    z-index: 1;
+}
+
+.RootRadixElement {
+    display: inline-block;
+    position: relative;
+}
+
+.RootRadixElement > div {
+    display: inline-block;
+    margin-left: 0.6em;
+}
+
+.RootSWElement {
+    position: absolute;
+    top: 0px;
+    bottom: 0.20em;
+    left: 0.5px;
+}
+
+.RootSWElement > svg {
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 0.6em;
+}
+
+.RootRadixElement > div > div:nth-child(2) {
+    border-top: 1px solid black;
+}
+
+.fakeInput {
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+    border: none;
+    outline: none;
+}
+
+.activeElement {
+    display: inline-block;
+}
+
+.AutoCompleteWrapper {
+    position: absolute;
+    height: min-content;
+    font-size: 1.3em;
+    bottom: 1.3em;
+    left: 0;
+    background-color: white;
+    overflow: hidden;
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.4);
+    border-radius: 0px 10px 10px 10px;
+}
+
+.AutoCompleteSelected {
+    background-color: lightgrey;
+}
+
+.AutoCompleteWrapper > div {
+    padding: 0.2em;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.AutoCompleteWrapper > div > div:nth-child(2) {
+    margin-left: 1.2em;
+    font-size: 0.6em;
+    align-self: flex-end;
+}
+
+.LeftOfCursor {
+    padding-right: 0px;
+}
+
+.RightOfCursor {
+    padding-left: 0px;
+}
+
+.Cursor {
+    display: inline-block;
+}
+
+.Cursor:after {
+    content: '';
+    width: 0.1em;
+    height: 1em;
+    background: black;
+    opacity: 1;
+    vertical-align: -0.15em;
+    display: inline-block;
+    animation: blink 0.5s step-start infinite alternate;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.EmptyWarning {
+    background-color: lightgrey;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    border-radius: 3px;
+}

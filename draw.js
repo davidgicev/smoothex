@@ -1,24 +1,52 @@
-function draw() {
-	drawAxes()
-	drawGrid()
+import {state, config} from './app.js';
+import {nearestToBase, formatNumber, roundToNumber} from './mathHelpers.js';
+import {functions, variables, builtInFunctions, builtInVariables} from './itemClass.js';
+import {Interval} from './intervalArithmetic.js'
+import {renderFunction} from './render.js'
+import {handleDraw} from './drawHandler.js'
+
+var canvas = document.getElementById("screen")
+
+let draw = function() {
+
+	handleDraw()
+
+	let ctx = canvas.getContext('2d');
+	// ctx.save();
+	ctx.clearRect(0,0,config.width,config.height)
+	// ctx.globalCompositeOperation = "destination-over"; //obraten redosled treba da se crtaat zaradi ova
+
+	if(config.setupState.grid) {
+		drawGrid()
+	}
+
+	if(config.setupState.axes) {
+		drawAxes()
+	}
+
 	drawFunctions()
-	// variables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
-	// builtInVariables[1].value = xInterval + screenWidth/scale/2 + windowWidth*commandContainerRatio/scale/2
+	// ctx.restore()
 }
 
-function drawFunctions() {
-
+let drawFunctions = function() {
 	for (let i=builtInFunctions.length; i<functions.length; i++) {
 		drawFunction(functions[i])
 	}
 }
 
-function drawAxes() {
+
+let drawAxes = function() {
+
+
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let screenWidth = config.width;
+	let windowHeight = config.height;
+	let scale = state.scale
 
 	let ctx = canvas.getContext('2d');
-	ctx.clearRect(0,0,windowWidth,windowHeight)
 
-	ctx.strokeStyle = theme.axes
+	ctx.strokeStyle = config.theme.axes
 	ctx.lineWidth = 1
 
 	ctx.beginPath()
@@ -31,23 +59,28 @@ function drawAxes() {
 	ctx.lineTo(-xInterval*scale, windowHeight)
 	ctx.stroke()
 
+	if(!config.setupState.grid)
+		return
+
 	ctx.font = "15px Arial";
 	ctx.textAlign = "center";
 
-	let nIncrement = screenWidth*(1-commandContainerRatio)/scale
+	let nIncrement = screenWidth*(1-config.commandContainerRatio)/scale
 
 	nIncrement /= 5;
 
 	nIncrement = nearestToBase(nIncrement,2)
+
+	ctx.lineWidth = 1
+
+	ctx.fillStyle = config.theme.axes
 
 	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
 		let x = i
 		let renderX = (i-xInterval)*scale 
 
-		ctx.lineWidth = 1
-
-		ctx.fillStyle = theme.axes
+		
 
 		ctx.beginPath()
 		let length = 5
@@ -68,10 +101,7 @@ function drawAxes() {
 		let y = i
 		let renderY = (i-yInterval)*scale 
 
-		ctx.lineWidth = 1
-
-		ctx.fillStyle = theme.axes
-
+		
 		ctx.beginPath()
 		let length = 5
 		ctx.moveTo(-xInterval*scale + 5, renderY)
@@ -87,31 +117,34 @@ function drawAxes() {
 	}
 }
 
+let drawGrid = function() {
 
-function drawGrid() {
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let screenWidth = config.width;
+	let windowHeight = config.height;
+	let scale = state.scale
 
 	let ctx = canvas.getContext('2d');
 
-	ctx.strokeStyle = theme.axes
 	ctx.lineWidth = 1
 
 	ctx.font = "15px Arial";
 	ctx.textAlign = "center";
 
-	let nIncrement = screenWidth*(1-commandContainerRatio)/scale
+	let nIncrement = screenWidth*(1-config.commandContainerRatio)/scale
 
 	nIncrement /= 20;
 
 	nIncrement = nearestToBase(nIncrement, 2)
+
+	ctx.strokeStyle = config.theme.grid
 
 	for(let i=roundToNumber(xInterval, nIncrement); i<screenWidth/scale + xInterval; i += nIncrement) {
 
 		let x = i
 		let renderX = (i-xInterval)*scale 
 
-		ctx.lineWidth = 1
-
-		ctx.strokeStyle = "rgba(0,0,0,0.2)"
 
 		ctx.beginPath()
 		let length = 5
@@ -126,25 +159,99 @@ function drawGrid() {
 		let y = i
 		let renderY = (i-yInterval)*scale 
 
-		ctx.lineWidth = 1
-
-		ctx.strokeStyle = "rgba(0,0,0,0.2)"
-
 		ctx.beginPath()
 		let length = 5
 		ctx.moveTo(0, renderY)
-		ctx.lineTo(windowWidth, renderY)
+		ctx.lineTo(screenWidth, renderY)
 		ctx.stroke()
 
+	}	
+}
+
+let drawFunction = function(f) {
+
+	if(!f || f.hidden || !f.f || f.f.length != 1) {
+		return
+	}
+
+	renderFunction(f)
+	return
+
+
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let windowWidth  = config.width;
+	let windowHeight = config.height;
+	let scale = state.scale
+	
+	if(!f.cache.span) {
+		console.log("kreiram cache span")
+		f.cache.points = drawFunctionPoints(f, 0, windowWidth);
+		f.cache.span = [xInterval, windowWidth/scale + xInterval]
+	}
+
+	// console.log(f.cache.span)
+
+	let mappedLo = Math.ceil((f.cache.span[0]-xInterval)*scale)
+	let mappedHi = Math.floor((f.cache.span[1]-xInterval)*scale)
+	if(mappedLo < 0) {
+		console.log("brisham desno", windowWidth)
+		removeFunctionPoints(f, windowWidth/scale+xInterval, null)
+	}
+	else if(mappedLo > 0) {
+		console.log("proshiruvam levo")
+		f.cache.points.unshift(...drawFunctionPoints(f, 0, mappedLo))
+	}
+
+	if(mappedHi > windowWidth) {
+		console.log("brisham levo", 0)
+		removeFunctionPoints(f, null, xInterval)
+	}
+	else if(mappedHi < windowWidth) {
+		console.log("proshiruvam desno")
+		f.cache.points.push.apply(f.cache.points, drawFunctionPoints(f, mappedHi, windowWidth))
+	}
+
+	f.cache.span = [xInterval, windowWidth/scale + xInterval]
+	renderFunction(f);
+}
+
+function removeFunctionPoints(f, a, b) {
+	if(a == null) {
+		let index = findPoint(f.cache.points, b, true);
+		f.cache.points.splice(0, index)
+	}
+	else if (b == null) {
+		let index = findPoint(f.cache.points, a, false);
+		f.cache.points.splice(a, index)
 	}
 }
 
-function drawFunction(f) {
+function findPoint(array, a, odLevo) {
+	for(let i=0; i<array.length-1; i++) {
+		if(a <= array[i+1].point[0] && a >= array[i].point[0])
+			return odLevo ? i : i+1
+	}
+	if(a < array[0].point[0])
+		return 0
+	else
+		return array.length-1
+}
+
+let drawFunctionOld = function(f) {
+
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let screenWidth  = config.width;
+	let windowHeight = config.height;
+	let scale = state.scale
 
 	let nIncrement = 0.01
 
 	let minatIzvod = 1
 	let sporedbeno = 0.1
+	let minatY = 0
+	let pointCounter = 0;
 
 	//let vreme = (new Date()).getTime()
 
@@ -153,58 +260,70 @@ function drawFunction(f) {
 	}
 
 	let color = f.color
+	let copyF = f;
 	f = f.f
 
 	let ctx = canvas.getContext("2d")
 
 	ctx.beginPath()
 
-
-	for(let i=xInterval; i<screenWidth/scale + xInterval;) {
-
 	ctx.strokeStyle = color
 	ctx.lineWidth = 3
 
-	let x = i
-	let y = -f(x)
+	for(let i=xInterval; i<screenWidth/scale + xInterval;) {
+
+	
+	let x1 = i
+	let y1 = -f(x1)
 
 	i += nIncrement
-
-	if(isNaN(y))
-		continue
 
 	let x2 = i
 	let y2 = -f(x2)
 
-	let renderX = (x-xInterval)*scale
-	let renderY = (y-yInterval)*scale
+	i += nIncrement
 
-	let renderX2 = (x2-xInterval)*scale
-	let renderY2 = (y2-yInterval)*scale
+	let x3 = i
+	let y3 = -f(x3)
 
+	if(isNaN(y1))
+		continue
 
-	let momentalenIzvod = (-(y2-y)/nIncrement)
+	let dy1 = (-(y2-y1)/nIncrement)
+	let dy2 = (-(y3-y2)/nIncrement)
+
 	let starn = nIncrement
-	let promena = Math.max(Math.abs((momentalenIzvod - minatIzvod)/nIncrement)*10, 10)
-	promena = Math.max(1 / promena, 0.01)
-	promena = promena*Math.min(1/(zoom), 5)
 
+	let promena = Math.max(Math.abs((dy2 - dy1)/nIncrement)*10, 10)
+	promena = Math.max(1 / promena, 0.01)
+	promena = promena*Math.min(1/(state.zoom), 5)
 
 	// let zaRender = promena*10//(momentalenIzvod - minatIzvod)/nIncrement
 
 	nIncrement = promena
 
-	
+
 	if(scale < 1)
 		nIncrement = 1/scale	
 
 	if(starn > nIncrement) {
 
-	
-
-		i = i - starn
+		i = i - 2*starn
 		continue
 	}
+
+
+
+	let renderX1 = (x1-xInterval)*scale
+	let renderY1 = (y1-yInterval)*scale
+
+	let renderX2 = (x2-xInterval)*scale
+	let renderY2 = (y2-yInterval)*scale
+
+	let renderX3 = (x3-xInterval)*scale
+	let renderY3 = (y3-yInterval)*scale
+
+	pointCounter++;
 
 	// ctx.fillStyle = "red"
 
@@ -218,199 +337,124 @@ function drawFunction(f) {
 	// ctx.arc(renderX,  (-zaRender - yInterval)*scale, 5, 0, 2*3.14);
 	// ctx.fill()	
 
-	minatIzvod = momentalenIzvod
-
-	if(Math.abs(momentalenIzvod) > windowHeight) {
-		//asimptota
+	if(Math.abs(dy1) > windowHeight || Math.abs(dy2) > windowHeight) {
 
 		ctx.stroke()
 
 		ctx.beginPath()
-		ctx.moveTo(renderX , renderY)
-		ctx.lineTo(renderX, Math.sign(y)*(windowHeight))
+		ctx.moveTo(renderX1 , renderY1)
+		ctx.lineTo(renderX1, y1*windowHeight)
 		ctx.stroke()
+
 
 		ctx.beginPath()
 		ctx.moveTo(renderX2 , renderY2)
-		ctx.lineTo(renderX, Math.sign(y2)*(windowHeight))
+
+		if(Math.abs(y2-y1) < Math.abs(y3-y2))
+			ctx.lineTo(renderX1, renderY1)
+		else
+			ctx.lineTo(renderX3, renderY3)
+
 		ctx.stroke()
 
-		// ctx.beginPath()
-
+		ctx.beginPath()
+		ctx.moveTo(renderX3 , renderY3)
+		ctx.lineTo(renderX3, y3*windowHeight)
+		ctx.stroke()
 
 		continue
 	}
 
-
-	// ctx.beginPath()
-	ctx.moveTo(renderX , renderY)
+	ctx.moveTo(renderX1, renderY1)
 	ctx.lineTo(renderX2, renderY2)
-	// ctx.stroke()
+	ctx.lineTo(renderX3, renderY3)
 
 	}
+
+	// console.log("number of points drawn: "+pointCounter)
 
 	//elapsedTime += (new Date()).getTime() - vreme
 	//console.log(elapsedTime)
 	//elapsedTime = 0
 	ctx.stroke()
-
 }
 
+let drawFunctionPoints = function(f, a, b) {
 
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let screenWidth  = config.width;
+	let windowHeight = config.height;
+	let scale = state.scale
+	let points = []
+	let pointCounter = 0
+	let F = f
 
-function drawParametric(f) {
+	f = f.f
 
-	let xFunk = f.xFunk
-	let yFunk = f.yFunk
+	let x1 = a/scale + xInterval
+	let y1 = -f(x1)
 
-	let color = f.color
+	let x2 = (a+1)/scale + xInterval
+	let y2 = -f(x2)
 
-	let ctx = canvas.getContext("2d")
+	let x3, y3;
 
-	for(let t=0; t<100; t += nIncrement) {
+	let renderX1 = a
+	let renderY1 = a+1
 
-	ctx.strokeStyle = color
-	ctx.lineWidth = 3
+	let renderX2, renderX3, renderY2, renderY3;
 
-	let x =  xFunk(t)
-	let y = -yFunk(t)
+	points.push({point: [x1, y1]})
 
+	for(let i=a+1; i<=b;) {
 
-	let x2 =  xFunk(t+nIncrement)
-	let y2 = -yFunk(t+nIncrement)
+		x1 = x2;
+		y1 = y2;
+		x2 = x3;
+		y2 = y3;
 
-	let renderX = (x-xInterval)*scale
-	let renderY = (y-yInterval)*scale
+		i += 1
 
-	let renderX2 = (x2-xInterval)*scale
-	let renderY2 = (y2-yInterval)*scale
+		x3 = i/scale + xInterval
+		y3 = -f(x3)
 
-	ctx.beginPath()
-	ctx.moveTo(renderX , renderY)
-	ctx.lineTo(renderX2, renderY2)
-	ctx.stroke()
-	ctx.fill()
-	}
-}
+		renderX1 = i-2
+		renderY1 = (y1-yInterval)*scale
 
-function drawFunctionInit(f) {
+		renderX2 = i-1
+		renderY2 = (y2-yInterval)*scale
 
-	functions.push(f)
+		renderX3 = i
+		renderY3 = (y3-yInterval)*scale
 
-	let orginalna = f.f;
+		// let range = F.cif(new Interval(x2, x3))
 
-	let funkcija = function() {
+		// if(!isFinite(range.lo) || !isFinite(range.hi)) {
+		// 	points.push({point: [x2, y2], infinities: [range.lo, range.hi]})
+		// 	x2 = x1
+		// 	y2 = y1
+		// 	continue
+		// }
 
-		if(this.smooth > 1) {
-
-			f.f = orginalna
-
-			return -1
+		if(Math.abs((x3-x1)*(y1-y2)-(x1-x2)*(y3-y1))*scale*scale < 1) {
+			x2 = x1;
+			y2 = y1;
+			continue;
 		}
 
-		let koef = -2*Math.pow(this.smooth,3)+3*Math.pow(this.smooth, 2)
+		// let testResult = midpointTest(F, x2, x3, range);
 
-		f.f =  x => orginalna(x)*koef;
+		points.push({point: [x2, y2]})
+		pointCounter++;
 
-		this.smooth += 0.01*(INTERVAL/(1000/60))
 	}
 
-	return funkcija.bind({smooth:0});
+	points.push({point: [x3, y3]})
+	return points
 }
 
-function drawFunctionTransition(f1, f2) {
-
-	let f1Copy = f1.f
-	let f2Copy = f2.f
-
-	functions[f1.id].f        = f2.f
-	functions[f1.id].readable = f2.readable	
-
-	let funkcija = function() {
-
-		if(this.smooth >= 1) {
-
-			functions[f1.id].f = f2Copy
-
-			return -1
-		}
-
-		let koef = -2*Math.pow(this.smooth,3)+3*Math.pow(this.smooth, 2)
-
-
-		functions[f1.id].f =  x => f1Copy(x) + koef*(f2Copy(x) - f1Copy(x))
-
-		this.smooth += 0.01*(INTERVAL/(1000/60))
-	}
-
-	return funkcija.bind({smooth:0});
-
-}
-
-function drawFunctionClosure(f) {
-
-	let funkcija = function() {
-
-		if(this.smooth > 1) {
-
-
-			return -1
-		}
-
-		let koef = -2*Math.pow(this.smooth,3)+3*Math.pow(this.smooth, 2)
-
-		let funk = {
-			f: x => f.f(x)*(1-koef),
-			color: f.color
-		}
-
-		drawFunction(funk)
-
-		this.smooth += 0.02*(INTERVAL/(1000/60))
-	}
-
-	return funkcija.bind({smooth:0});
-}
-
-
-function animateVariable(animationContainer) {
-
-	let index = contains(variables, "name", animationContainer.name)
-
-	let min = animationContainer.children[3].children[0].children[0].value
-	min = Number(min)
-	let max = animationContainer.children[3].children[1].children[0].value
-	max = Number(max)
-	// let step = animationContainer.children[3].children[2].children[0].value
-	// step = Number(step)
-	let speed = animationContainer.children[3].children[2].children[0].value
-	speed = Number(speed)
-
-	let funkcija = {
-		f: function() {
-
-			if(this.period > max || this.period < min) {
-				this.speed *= -1
-			}
-
-			variables[index].value = this.period
-			animationContainer.parentElement.parentElement.children[0].value = variables[index].name + " = " + this.period.toFixed(2)
-			animationContainer.parentElement.children[0].innerHTML = "Value: " + this.period.toFixed(2)
-			animationContainer.parentElement.children[2].children[0].value = this.period
-
-			this.period += this.speed*0.005*((max-min)/10)
-		},
-		id: animationContainer.name,
-		speed: speed,
-		period: variables[index].value
-	}
-
-	funkcija.f = funkcija.f.bind(funkcija)
-
-	return funkcija;
-}
-
-function animateXInterval() {
+let animateXInterval = function() {
 	let funkcija = {
 		f: function() {
 
@@ -434,20 +478,12 @@ function animateXInterval() {
 	animate()
 }
 
-function drawTangent() {
+let previewPoints = function() {
 
-	functions.push({
-		name: "derivative",
-		f: x => Math.cos(xInterval-5)*(x-xInterval-5) + Math.sin(xInterval-5),
-		color: "blue",
-	})
-
-	animateXInterval()
-}
-
-
-
-function previewPoints() {
+	let xInterval = state.xInterval;
+	let yInterval = state.yInterval;
+	let screenWidth = config.width;
+	let scale = state.scale
 
 	draw()
 
@@ -490,3 +526,11 @@ function previewPoints() {
 		}
 	}
 }
+
+export {
+	draw,
+	drawFunctions,
+	drawAxes,
+	drawGrid,
+};
+
